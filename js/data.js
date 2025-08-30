@@ -1,0 +1,240 @@
+wings = [
+  { id: 1, latitude: 14.922384190835775, longitude: 102.06244240889576 },
+  { id: 2, latitude: 14.87097004498014, longitude: 100.6481880665653 },
+  { id: 3, latitude: 13.765293489170809, longitude: 102.32084819514293 },
+  { id: 4, latitude: 15.252397054889357, longitude: 100.28862951074964 },
+  { id: 5, latitude: 11.795388586056117, longitude: 99.8014604905143 },
+  { id: 6, latitude: 13.920150279045579, longitude: 100.61779998188754 },
+  { id: 7, latitude: 9.152801738285056, longitude: 99.14811885865734 },
+  { id: 21, latitude: 15.240618909498409, longitude: 104.85459156472587 },
+  { id: 23, latitude: 17.376035828251943, longitude: 102.79685574239994 },
+  { id: 41, latitude: 18.772209453327804, longitude: 98.96745899282098 },
+  { id: 46, latitude: 16.7961393143696, longitude: 100.27220521347759 },
+  { id: 56, latitude: 6.930852601816476, longitude: 100.41599626644548 },
+];
+
+_vehicles = [
+  {
+    id: 1,
+    name: "รถบรรทุก",
+    capacity: 250,
+  },
+  {
+    id: 2,
+    name: "ยูนิม็อก",
+    capacity: 400,
+  },
+  {
+    id: 3,
+    name: "เรือ",
+    capacity: 30,
+  },
+  {
+    id: 4,
+    name: "เฮลิคอปเตอร์",
+    capacity: 50,
+  },
+];
+
+communities = [
+  {
+    id: 1,
+    address: "ชุมชนโรงเรียนเบ็ญจะมะมหาราช(วังแดง)",
+    latitude: 15.239571476536174,
+    longitude: 104.83922575288524,
+  },
+  {
+    id: 2,
+    address: "ชุมชนโรงเรียนเบ็ญจะมะมหาราช 3",
+    latitude: 15.2436010086359,
+    longitude: 104.83453713190346,
+  },
+  {
+    id: 3,
+    address: "ชุมชนวัดท่าวังหิน",
+    latitude: 15.23577498541874,
+    longitude: 104.83582451900244,
+  },
+  {
+    id: 4,
+    address: "ชุมชนหลังโรงเรียนเยาวเรศฯ 2",
+    latitude: 15.232865818909843,
+    longitude: 104.84595630011812,
+  },
+  {
+    id: 5,
+    address: "ชุมชนหลังโรงเรียนเยาวเรศฯ 3",
+    latitude: 15.232472446787309,
+    longitude: 104.84839174579288,
+  },
+  {
+    id: 6,
+    address: "ชุมชนวัดเลียบ 2",
+    latitude: 15.22674022043616,
+    longitude: 104.87067866620873,
+  },
+  {
+    id: 7,
+    address: "ชุมชนศาลากลางบ้านดู่ 1",
+    latitude: 15.23909671759851,
+    longitude: 104.87161223454775,
+  },
+  {
+    id: 8,
+    address: "ชุมชนวัดป่าแสนอุดม 1",
+    latitude: 15.253507394060081,
+    longitude: 104.82993365271608,
+  },
+  {
+    id: 9,
+    address: "ชุมชนวัดบูรพา 1",
+    latitude: 15.239791737144404,
+    longitude: 104.87352155640885,
+  },
+  {
+    id: 10,
+    address: "ชุมชนวัดบูรพา 2",
+    latitude: 15.36749902036216,
+    longitude: 104.72181276854755,
+  },
+  {
+    id: 11,
+    address: "ชุมชนวัดบูรพา 3",
+    latitude: 15.140167220834332,
+    longitude: 104.83206234140705,
+  },
+  {
+    id: 12,
+    address: "ชุมชนวัดกุดคูณ 2",
+    latitude: 15.23485491755537,
+    longitude: 104.83576610674271,
+  },
+  {
+    id: 13,
+    address: "ชุมชนถนนพนม 2",
+    latitude: 15.224497125532846,
+    longitude: 104.86067615738918,
+  },
+  {
+    id: 14,
+    address: "ชุมชนวัดโรมันคาทอลิค",
+    latitude: 15.226839244009676,
+    longitude: 104.850472323494,
+  },
+  {
+    id: 15,
+    address: "ชุมชนถนนพนม 1",
+    latitude: 15.226693761368493,
+    longitude: 104.84974570218665,
+  },
+  {
+    id: 16,
+    address: "ชุมชนโรงเรียนเทศบาลบูรพาอุบลฯ 1",
+    latitude: 15.227486172009883,
+    longitude: 104.86746783737313,
+  },
+  {
+    id: 17,
+    address: "ชุมชนวัดกุดคูณ 1",
+    latitude: 15.23286006751131,
+    longitude: 104.83713416620888,
+  },
+  {
+    id: 18,
+    address: "ชุมชนวัดกลาง",
+    latitude: 15.227083126540478,
+    longitude: 104.86318422400242,
+  },
+  {
+    id: 19,
+    address: "ชุมชนวัดหลวง 1",
+    latitude: 15.227002548725716,
+    longitude: 104.85978204488987,
+  },
+  {
+    id: 20,
+    address: "ชุมชนวัดหลวง 2",
+    latitude: 15.225327545824088,
+    longitude: 104.86222506871098,
+  },
+  {
+    id: 21,
+    address: "ชุมชนวัดศรีประดู่ 2",
+    latitude: 15.242463774107812,
+    longitude: 104.90090227929444,
+  },
+  {
+    id: 22,
+    address: "ชุมชนศาลากลางบ้านดู่ 2",
+    latitude: 15.243299303697565,
+    longitude: 104.87721128855412,
+  },
+  {
+    id: 23,
+    address: "ชุมชนศาลากลางบ้านดู่ 3",
+    latitude: 15.242219666046713,
+    longitude: 104.87586737288837,
+  },
+  {
+    id: 24,
+    address: "ชุมชนวัดเลียบ 1",
+    latitude: 15.327181204125047,
+    longitude: 104.77541230462955,
+  },
+  {
+    id: 25,
+    address: "ชุมชนวัดศรีประดู่ 1",
+    latitude: 15.238197069464396,
+    longitude: 104.87379521283019,
+  },
+  {
+    id: 26,
+    address: "ชุมชนวัดศรีแสงทอง",
+    latitude: 15.253035857856087,
+    longitude: 104.8830023797026,
+  },
+  {
+    id: 27,
+    address: "ชุมชนสหกรณ์การเกษตร 2",
+    latitude: 15.188142037511886,
+    longitude: 104.86310534796522,
+  },
+  {
+    id: 28,
+    address: "ชุมชนวัดพลแพน",
+    latitude: 15.232066695333128,
+    longitude: 104.86807564107123,
+  },
+  {
+    id: 29,
+    address: "ชุมชนตลาดสดเทศบาล 5",
+    latitude: 15.27756599361001,
+    longitude: 104.87154002944085,
+  },
+  {
+    id: 30,
+    address: "บ้านท่าบ่อ หมู่ที่ 2",
+    latitude: 15.312732082825388,
+    longitude: 104.84680199388212,
+  },
+  {
+    id: 31,
+    address: "บ้านทัพไท หมู่ 7",
+    latitude: 15.220063917949647,
+    longitude: 104.81802768072549,
+  },
+  {
+    id: 32,
+    address: "บ้านท่ากกแห่",
+    latitude: 15.207410516044801,
+    longitude: 104.8184769728085,
+  },
+  {
+    id: 33,
+    address: "บ้านหาดคู่เดื่อ",
+    latitude: 15.211200479291607,
+    longitude: 104.79482678739701,
+  },
+];
+
+// AAPTxy8BH1VEsoebNVZXo8HurBEwtQ3TZNnChgqbR-VNfayPQ2LL2HzAyGwmz4JkMpHlO8ny01mMiOXu9L4R_5BchZcNTEqcvmJnhFE5OjLaMs0DK0he1Eeil0PyCiqaII0Da7tFc7KKxexFyOzk-ShAp9NzcEJfnyIkw0NGQHDAm3prSxAVrG6R_5BchZcNTEqcvmJnhFE5OjLaMs0DK0he1Eeil0PyCiqaII0Da7tFc7KKxexFyOzk-ShAp9NzcEJfnyIkw0NGQHDAm3prSxAVrG6RAtu3utx_F8tuzuy74-1yu7UtCF7K6l5AlYIZi3N7XRAA55U9DUzQaLhNsfcE8PGnRW3l64PM0qYgAT1_b6Losegl

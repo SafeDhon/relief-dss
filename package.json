@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@arcgis/core": "^4.33.5",
-    "bootstrap": "^5.3.3"
-  }
-}

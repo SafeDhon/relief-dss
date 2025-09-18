@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Vehicle</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="css/vehicle.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="appbar">
+      <div class="appbar-left">
+        <img src="https://safedhon.github.io/relief-dss/images/logo.png" alt="โลโก้" class="appbar-logo" />
+        <span class="appbar-title"
+          >ระบบสนับสนุนการตัดสินใจในการจัดสรรทรัพยากรบรรเทาสาธารณภัยของกองทัพอากาศ</span
+        >
+      </div>
+      <button class="appbar-btn">ข้อมูลเพิ่มเติม</button>
+    </header>
+    <div class="container">
+      <table class="table table-striped">
+        <colgroup>
+          <col style="width: 5%" />
+          <col style="width: 35%" />
+          <col style="width: 12%" />
+          <col style="width: 12%" />
+          <col style="width: 13%" />
+          <col style="width: 11%" />
+          <col style="width: 12%" />
+        </colgroup>
+        <tr class="table-head">
+          <th>ลำดับ</th>
+          <th>ชุมชน</th>
+          <th>ละติจูด</th>
+          <th>ลองจิจูด</th>
+          <th>ผู้ประสบภัย</th>
+          <th>ถุงยังชีพ</th>
+          <th>พาหนะ</th>
+        </tr>
+        <tbody id="myTable"></tbody>
+      </table>
+
+      <div class="flex-container">
+        <button class="btnCal" id="saveDataButton">จัดกลุ่มพาหนะ</button>
+      </div>
+    </div>
+    <script src="js/vehicle.js" type="module"></script>
+  </body>
+</html>

@@ -1,0 +1,104 @@
+/* จัด container ให้อยู่กลางแนวนอน */
+.container {
+  display: flex;
+  flex-direction: column; /* วาง header, table, ... ในแนวตั้ง */
+  align-items: center; /* จัดกลางแนวนอน */
+  justify-content: flex-start; /* เริ่มจากด้านบน */
+  padding: 20px;
+}
+
+.delivery-table {
+  width: 1000px;
+  border-collapse: separate; /* ใช้ separate แทน collapse */
+  border-spacing: 0; /* เอาช่องว่างออก */
+  margin: 0 auto 20px;
+  text-align: center;
+  font-size: 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 10px; /* ✅ ทำให้ตารางมีมุมโค้ง */
+  overflow: hidden; /* บังคับให้เนื้อหาโค้งตาม */
+  font-family: "Noto Sans Thai", sans-serif;
+}
+
+/* ✅ ทำมุมบนซ้ายและขวาโค้ง */
+.delivery-table th:first-child {
+  border-top-left-radius: 10px;
+}
+.delivery-table th:last-child {
+  border-top-right-radius: 10px;
+}
+
+/* ✅ ทำมุมล่างซ้ายและขวาโค้ง */
+.delivery-table tr:last-child td:first-child {
+  border-bottom-left-radius: 10px;
+}
+.delivery-table tr:last-child td:last-child {
+  border-bottom-right-radius: 10px;
+}
+
+.delivery-table th {
+  background-color: #4b4b4b;
+  color: white;
+  padding: 10px 15px;
+  height: 40px;
+}
+
+.delivery-table td {
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  height: 35px;
+}
+
+.delivery-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.delivery-table th:nth-child(1),
+.delivery-table td:nth-child(1) {
+  width: 7%; /* ลำดับ */
+}
+
+.delivery-table th:nth-child(2),
+.delivery-table td:nth-child(2) {
+  width: 30%; /* ต้นทาง */
+}
+
+.delivery-table th:nth-child(3),
+.delivery-table td:nth-child(3) {
+  width: 30%; /* ปลายทาง */
+}
+
+.delivery-table th:nth-child(4),
+.delivery-table td:nth-child(4) {
+  width: 13%; /* ระยะทาง */
+}
+
+.delivery-table th:nth-child(5),
+.delivery-table td:nth-child(5) {
+  width: 13%; /* ระยะทางสะสม */
+}
+
+.delivery-table th:nth-child(6),
+.delivery-table td:nth-child(6) {
+  width: 7%; /* จัดส่ง (checkbox) */
+}
+
+.delivery-table input[type="checkbox"] {
+  width: 20px; /* ขนาดความกว้าง */
+  height: 20px; /* ขนาดความสูง */
+  accent-color: #04aa6d; /* สีติ้กเป็นเขียว */
+  cursor: pointer;
+}
+
+/* คอลัมน์ที่ 2 (ต้นทาง) */
+.delivery-table td:nth-child(2) {
+  text-align: left;
+  padding-left: 12px; /* กันไม่ให้ติดขอบเกินไป */
+}
+
+/* คอลัมน์ที่ 3 (ปลายทาง) */
+.delivery-table td:nth-child(3) {
+  text-align: left;
+  padding-left: 12px;
+}
+

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Route</title>
+    <link rel="stylesheet" href="../css/route1.css" />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.29/esri/themes/light/main.css"
+    />
+    <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
+    <script src="https://js.arcgis.com/4.29/"></script>
+
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        flex: 1; /* กินพื้นที่ที่เหลือ */
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="appbar">
+      <div class="appbar-left">
+        <img
+          src="https://safedhon.github.io/relief-dss/images/logo.png"
+          alt="โลโก้"
+          class="appbar-logo"
+        />
+        <span class="appbar-title"
+          >ระบบสนับสนุนการตัดสินใจในการจัดสรรทรัพยากรบรรเทาสาธารณภัยของกองทัพอากาศ</span
+        >
+      </div>
+      <button class="appbar-btn">ข้อมูลเพิ่มเติม</button>
+    </header>
+    <div id="viewDiv"></div>
+
+    <div id="buttonDiv4" class="esri-widget esri-component">
+      <button id="drawPolylineBarrier" type="button" class="esri-button">
+        วาดสิ่งกีดขวาง
+      </button>
+    </div>
+    <div id="buttonDiv3" class="esri-widget esri-component">
+      <button id="recalculateRoute" type="button" class="esri-button">
+        คำนวณเส้นทางใหม่
+      </button>
+    </div>
+    <div id="buttonDiv1" class="esri-widget esri-component">
+      <button id="saveRoute" type="button" class="esri-button">
+        บันทึกเส้นทาง
+      </button>
+    </div>
+
+    <script src="../js/route1.js"></script>
+    <script src="../js/data.js"></script>
+  </body>
+</html>

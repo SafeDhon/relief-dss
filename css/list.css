@@ -1,0 +1,93 @@
+/* =======================
+   container สำหรับ scroll
+======================= */
+.container {
+  overflow-x: auto; /* scroll horizontal ถ้าตารางกว้าง */
+  padding: 8px 8px 16px 8px;
+}
+
+/* =======================
+   ตารางหลัก
+======================= */
+#rescueTable {
+  width: 100%;
+  border-collapse: separate; /* ต้อง separate */
+  border-spacing: 0 6px; /* vertical 6px ระหว่าง row */
+  font-family: "Noto Sans Thai", sans-serif;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#rescueTable tbody tr:nth-child(even) td {
+  background-color: #f5f5f5;
+}
+
+#rescueTable tbody tr:nth-child(odd) td {
+  background-color: #ffffff;
+}
+
+#rescueTable tbody tr:hover td {
+  background-color: #e6f0fa;
+}
+
+/* =======================
+   Header
+======================= */
+#rescueTable thead th {
+  background-color: #4b4b4b; /* สีเทาเข้ม */
+  color: #ffffff;
+  text-align: center;
+  vertical-align: middle;
+  border: none;
+}
+
+.table-head th:first-child {
+  border-top-left-radius: 8px;
+  overflow: hidden;
+}
+
+/* =======================
+   Body cells
+======================= */
+#rescueTable tbody td {
+  padding: 12px 8px; /* top/bottom 12px */
+  text-align: center;
+  border: none;
+}
+#rescueTable tbody tr {
+  /* display: block; */
+  margin-bottom: 60px; /* ระยะระหว่าง row */
+  border-radius: 6px; /* มุมโค้งแต่ละ row */
+  overflow: hidden;
+}
+
+/* =======================
+   column 2 ชิดซ้าย
+======================= */
+#rescueTable tbody td:nth-child(2) {
+  text-align: left;
+  padding-left: 10px;
+}
+
+/* =======================
+   Hover effect
+======================= */
+#rescueTable tbody tr:hover {
+  background-color: #e6f0fa;
+}
+
+/* =======================
+   ปรับ column อื่น ๆ ชิดกลาง
+======================= */
+#rescueTable tbody td:not(:nth-child(2)),
+#rescueTable thead th:not(:nth-child(2)) {
+  text-align: center;
+}
+
+.table-button {
+  display: flex;
+  justify-content: flex-end; /* กดปุ่มชิดขวา */
+  margin-top: 10px; /* ระยะห่างจากตาราง */
+}

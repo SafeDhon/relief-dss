@@ -34,7 +34,6 @@ function fixDateFormat(dateStr) {
   return "";
 }
 
-
 async function fetchRescueData() {
   const refID = sessionStorage.getItem("refID");
 
@@ -56,19 +55,18 @@ async function fetchRescueData() {
 
     const checkListRef = collection(docRef, "checkList");
     const checkListSnap = await getDocs(checkListRef);
-    const checkListData = checkListSnap.docs.map(d => ({
+    const checkListData = checkListSnap.docs.map((d) => ({
       id: d.id,
       ...d.data(),
     }));
 
     renderTables(checkListData, refID);
-  } catch(err) {
+  } catch (err) {
     console.error(err);
   }
 }
 
 function renderTables(data, refID) {
-  data.pop();
   const tableContainer = document.getElementById("checkListTable");
   if (!tableContainer) return;
 
@@ -224,7 +222,6 @@ async function validateDateBeforeGo() {
 
   return true;
 }
-
 
 document.getElementById("conclu-button").addEventListener("click", async () => {
   const ok = await validateDateBeforeGo();

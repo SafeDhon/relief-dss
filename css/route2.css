@@ -1,0 +1,100 @@
+.esri-expand__content {
+  width: 800px !important;
+  max-width: 800px !important;
+}
+
+/* ตารางใน Expand */
+#routeTableContainer table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Noto Sans Thai", sans-serif;
+  font-size: 15px;
+  table-layout: fixed;
+}
+
+/* กำหนดสไตล์ของเซลล์ */
+#routeTableContainer th,
+#routeTableContainer td {
+  border: 1px solid #ddd;
+  padding: 10px 12px;
+  word-wrap: break-word;
+}
+
+/* หัวตารางอยู่กลาง */
+#routeTableContainer th {
+  background-color: #005a9e;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ทุกแถวพื้นหลังขาว */
+#routeTableContainer tr {
+  background-color: white;
+  color: black;
+}
+
+/* hover แถว */
+#routeTableContainer tr:hover {
+  background-color: #0078d7;
+  color: white;
+}
+
+/* column 1,4,5 ของ td อยู่ตรงกลาง */
+#routeTableContainer td:nth-child(1),
+#routeTableContainer td:nth-child(4),
+#routeTableContainer td:nth-child(5) {
+  text-align: center;
+}
+
+/* column 2,3 ของ td ชิดซ้าย */
+#routeTableContainer td:nth-child(2),
+#routeTableContainer td:nth-child(3) {
+  text-align: left;
+  white-space: nowrap; /* ห้ามตัดบรรทัด */
+  overflow: hidden; /* ซ่อนข้อความที่เกิน */
+  text-overflow: ellipsis;
+}
+
+.esri-widget.esri-component .esri-button {
+  font-family: "Noto Sans Thai", sans-serif; /* ฟอนต์ไทย */
+  font-size: 14px; /* ขนาดตัวอักษร */
+  padding: 10px 12px; /* ความสูงและกว้างของปุ่ม */
+  background-color: #0078d7; /* สีพื้นหลัง */
+  color: white; /* สีตัวอักษร */
+  border: none; /* ลบขอบเดิม */
+  cursor: pointer;
+}
+
+/* hover effect */
+.esri-widget.esri-component .esri-button:hover {
+  background-color: #005a9e;
+}
+
+/* กำหนดความกว้าง column */
+#routeTableContainer th:nth-child(1), /* ลำดับ */
+#routeTableContainer td:nth-child(1) {
+  width: 8%;
+  text-align: center;
+}
+
+#routeTableContainer th:nth-child(2), /* ต้นทาง */
+#routeTableContainer td:nth-child(2) {
+  width: 32%;
+}
+
+#routeTableContainer th:nth-child(3), /* ปลายทาง */
+#routeTableContainer td:nth-child(3) {
+  width: 32%;
+}
+
+#routeTableContainer th:nth-child(4), /* Distance */
+#routeTableContainer td:nth-child(4) {
+  width: 14%;
+}
+
+#routeTableContainer th:nth-child(5), /* Cumulative */
+#routeTableContainer td:nth-child(5) {
+  width: 14%;
+}

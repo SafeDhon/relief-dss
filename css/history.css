@@ -1,0 +1,13 @@
+.container {
+  background-color: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 1000px;
+  margin: 16px auto;
+}
+
+.container h2 {
+  text-align: center; /* จัดกลางแนวนอน */
+  margin-top: 0px; /* ระยะห่างจากขอบบน ปรับได้ตามต้องการ */
+}

@@ -7,7 +7,37 @@
   margin: 16px auto;
 }
 
-.container h2 {
+.container h1 {
   text-align: center; /* จัดกลางแนวนอน */
   margin-top: 0px; /* ระยะห่างจากขอบบน ปรับได้ตามต้องการ */
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-family: "Noto Sans Thai", sans-serif;
+  border: none; /* ✅ เอาเส้นรอบนอกออก */
+}
+
+.data-table th,
+.data-table td {
+  border: none; /* ✅ เอาเส้นในแต่ละช่องออก */
+  padding: 10px;
+  text-align: center; /* ✅ จัดข้อความในเซลล์ให้อยู่ตรงกลาง */
+}
+
+.data-table th {
+  background-color: #444; /* ✅ สีเทาเข้ม */
+  color: white; /* ✅ ตัวอักษรสีขาว */
+  font-weight: 600;
+}
+
+.data-table tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.data-table tr:hover {
+  background-color: #e6f7ff;
+  cursor: pointer;
 }

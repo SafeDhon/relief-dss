@@ -1,4 +1,5 @@
 require([
+  "esri/config",
   "esri/geometry/Extent",
   "esri/geometry/Point",
   "esri/Map",
@@ -12,6 +13,7 @@ require([
   "esri/rest/support/PolylineBarrier",
   "esri/widgets/Expand",
 ], function (
+  esriConfig,
   Extent,
   Point,
   Map,
@@ -29,7 +31,7 @@ require([
   // "AAPTxy8BH1VEsoebNVZXo8HurBEwtQ3TZNnChgqbR-VNfayPQ2LL2HzAyWwmz4JkMpHlO8ny01mMiOXu9L4R_5BchZcNTEqcvmJnhFE5OjLaMs0DK0he1Eeil0PyCiqaII0Da7tFc7KKxexFyOzk-ShAp9NzcEJfnylkw0NGQHDAm3prSxAVrG6R_5BchZcNTEqcvmJnhFE5OjLaMs0DK0he1Eeil0PyCiqaII0Da7tFc7KKxexFyOzk-ShAp9NzcEJfnylkw0NGQHDAm3prSxAVrG6RAtu3utx_F8tuzuy74-1yu7UtCF7K6l5AlYIZi3N7XRAA55U9DUzQaLhNsfcE8PGnRW3l64PM0qYgAT1_b6Losegl"; // *** อย่าลืมเปลี่ยนเป็น ArcGIS API Key ของคุณ! ***
   const apiKey =
     "AAPTxy8BH1VEsoebNVZXo8HurKkVHTRC57kXcOyUhu0FRgeHsBnlZmxAL2TXr9hSHt-0qfy83LKeW0vhUYtEKp_Nm3rpKrWvIP4wOZJY_LE6xnmcRPkJK1j3EeHTrp_VDCUexyJK0PEKIDWsn6WAHmuhkWDrtpGqsd5IdKZ48xmh8AKSxiGXgEG2IAywaCGMJNt1HWGxLeP_rlEutsm9HnaIh7WIGoJuMy-FZI0H39ehvDQ.AT1_AeCqLU8e";
-
+  esriConfig.apiKey = apiKey;
   const routeUrl =
     "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
 
@@ -241,11 +243,21 @@ require([
       stops: new FeatureSet({
         features: stops,
       }),
+      // polylineBarriers: new FeatureSet({
+      //   features: customPolylineBarriers.map(
+      //     (b) => new Graphic({ geometry: b.geometry })
+      //   ),
+      // }),
       polylineBarriers: new FeatureSet({
         features: customPolylineBarriers.map(
-          (b) => new Graphic({ geometry: b.geometry })
+          (b) =>
+            new PolylineBarrier({
+              geometry: b.geometry,
+              barrierType: "restriction", // 🚫 ห้ามผ่าน
+            })
         ),
       }),
+
       returnDirections: false,
       impedanceAttribute: "TravelTime",
     });
@@ -576,13 +588,12 @@ require([
       const newGraphic = event.graphic;
       drawnPolylineBarrierLayer.add(newGraphic);
       customPolylineBarriers.push(newGraphic);
-      // calculateAndDisplayAllRoutes();
+      await calculateAndDisplayAllRoutes();
     }
   });
 
   document.getElementById("recalculateRoute").addEventListener("click", () => {
     routesLayer.removeAll();
-    // stopsLayer.removeAll();
     calculateAndDisplayAllRoutes();
   });
 

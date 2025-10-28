@@ -1,0 +1,68 @@
+/* เพิ่มบรรทัดนี้ไว้ด้านบนสุดเลย */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Noto Sans Thai", sans-serif;
+  background: #f4f4f4;
+  height: 100vh;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.login-card {
+  background-color: white;
+  padding: 50px 30px;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  width: 500px; /* ✅ กว้างขึ้นนิดหน่อย */
+  min-height: 500px; /* ✅ เพิ่มความสูง */
+  text-align: center;
+}
+
+.appbar-logo {
+  height: 250px;
+  width: auto;
+  object-fit: contain;
+  margin-bottom: 10px;
+}
+
+.login-input {
+  width: 100%;
+  padding: 12px; /* ✅ ปรับเท่ากับปุ่ม */
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.login-btn {
+  width: 100%;
+  background-color: #1e88e5;
+  color: white;
+  border: none;
+  padding: 12px; /* ✅ เท่ากับ input */
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.login-btn:hover {
+  background-color: #1565c0;
+}
+
+.error-msg {
+  color: red;
+  margin-top: 10px;
+  font-size: 14px;
+}

@@ -6,6 +6,10 @@ import {
   where,
   getDocs,
 } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+} from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB9NIxqa9__0x9JSZplX2PS6ozqyRUPAQQ",
@@ -18,6 +22,17 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+
+// ✅ ตรวจสอบสถานะการล็อกอิน
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    // ❌ ยังไม่ได้ล็อกอิน → กลับไปหน้า login
+    window.location.href = "../pages/login.html";
+  } else {
+    console.log("ผู้ใช้เข้าสู่ระบบแล้ว:", user.email);
+  }
+});
 
 const searchOptions = document.getElementById("searchOptions");
 const listContainer = document.getElementById("listContainer");

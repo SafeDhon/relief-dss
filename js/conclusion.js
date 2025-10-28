@@ -24,18 +24,34 @@ const params = new URLSearchParams(window.location.search);
 const refID = params.get("refID");
 
 async function findDelivery(address, deliveries) {
+  let all = 0;
+  let sent = 0;
   for (const item of deliveries) {
     for (const key of Object.keys(item)) {
       if (Array.isArray(item[key])) {
         for (const obj of item[key]) {
+          console.log(`${obj["ปลายทาง"]} : ${address}`);
           if (obj["ปลายทาง"] === address) {
             return obj["จัดส่ง"] === 1;
+          }
+          if (obj["ปลายทาง"].startsWith(address)) {
+            console.log("match");
+            all = all + 1;
+            console.log(all);
+            if (obj["จัดส่ง"] === 1) {
+              sent = sent + 1;
+            }
+            console.log(sent);
           }
         }
       }
     }
   }
-  return false;
+  if (sent == all) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 async function fetchRescueData() {
@@ -65,9 +81,7 @@ async function fetchRescueData() {
     const checkListData = checkListSnap.docs.map((d) => ({
       ...d.data(),
     }));
-    console.log(checkListData[4]);
-
-    checkListData.pop(); // ตัดตัวสุดท้ายออก
+    console.log(checkListData);
 
     // ฟังก์ชันเพิ่ม field "จัดส่ง"
     async function markDeliveryStatus(mainData, checkListData) {

@@ -112,17 +112,23 @@ function renderTables(data, refID) {
                   ${orderedHeaders
                     .map((h) => {
                       if (h === "จัดส่ง") {
+                        // ❌ แถวสุดท้ายของแต่ละตาราง จะไม่ให้ติ๊ก
+                        if (index === dataObjs.length - 1) {
+                          return `<td>-</td>`; // หรือจะใส่ข้อความ "สรุป" ก็ได้
+                        }
+
                         return `<td>
-                        <input type="checkbox" 
-                          data-docid="${item.id}" 
-                          data-field="${key}" 
-                          data-index="${index}" 
-                          ${o[h] === 1 ? "checked" : ""}>
-                      </td>`;
+        <input type="checkbox" 
+          data-docid="${item.id}" 
+          data-field="${key}" 
+          data-index="${index}" 
+          ${o[h] === 1 ? "checked" : ""}>
+      </td>`;
                       }
                       return `<td>${o[h] ?? "-"}</td>`;
                     })
                     .join("")}
+
                 </tr>
               `
                 )

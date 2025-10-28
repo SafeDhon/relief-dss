@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Fillin</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../css/fillin.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="appbar">
+      <div class="appbar-left">
+        <img src="https://safedhon.github.io/relief-dss/images/logo.png" alt="โลโก้" class="appbar-logo" />
+        <span class="appbar-title">ระบบสนับสนุนการตัดสินใจในการจัดสรรทรัพยากรบรรเทาสาธารณภัยของกองทัพอากาศ</span>
+      </div>
+      <button class="appbar-btn" id="historyBtn">ประวัดการจัดส่ง</button>
+    </header>
+    <div class="container">
+      <table class="table table-striped">
+        <colgroup>
+          <col style="width: 4%" />
+          <col style="width: 16%" />
+          <col style="width: 9%" />
+          <col style="width: 9%" />
+          <col style="width: 9%" />
+          <col style="width: 9%" />
+          <col style="width: 9%" />
+          <col style="width: 8%" />
+          <col style="width: 9%" />
+          <col style="width: 10%" />
+          <col style="width: 8%" />
+        </colgroup>
+        <tr class="table-head">
+          <th>ลำดับ</th>
+          <th>ชุมชน</th>
+          <th>จำนวน</th>
+          <th>จำนวน</th>
+          <th>ระดับ</th>
+          <th>ความสามารถ</th>
+          <th>ความลำบาก</th>
+          <th>ใช้พาหนะของ</th>
+          <th>ระยะเวลา</th>
+          <th>ระดับ</th>
+          <th>ความเสี่ยง</th>
+        </tr>
+        <tr class="bg-info">
+          <th></th>
+          <th></th>
+          <th>ผู้ประสบภัย</th>
+          <th>กลุ่มเปราะบาง</th>
+          <th>ความเสียหาย</th>
+          <th>พึ่งพาตนเอง</th>
+          <th>เข้าถึงพื้นที่</th>
+          <th>ทอ. เท่านั้น</th>
+          <th>ประสบภัย</th>
+          <th>ความรุนแรง</th>
+          <th>ที่อาจเกิดซ้ำ</th>
+        </tr>
+        <tbody id="myTable"></tbody>
+      </table>
+
+      <div class="flex-container">
+        <button class="btnCal" id="btnCal">จัดลำดับ</button>
+      </div>
+    </div>
+    <script src="../js/fillin.js" type="module"></script>
+  </body>
+</html>

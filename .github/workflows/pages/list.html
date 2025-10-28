@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>List</title>
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/list.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="appbar">
+      <div class="appbar-left">
+        <img
+          src="https://safedhon.github.io/relief-dss/images/logo.png"
+          alt="โลโก้"
+          class="appbar-logo"
+        />
+        <span class="appbar-title"
+          >ระบบสนับสนุนการตัดสินใจในการจัดสรรทรัพยากรบรรเทาสาธารณภัยของกองทัพอากาศ</span
+        >
+      </div>
+      <button class="appbar-btn" id="historyBtn">ประวัดการจัดส่ง</button>
+    </header>
+    <div class="container">
+      <table
+        id="rescueTable"
+        border="1"
+        style="border-collapse: collapse; width: 100%"
+      >
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>ชุมชน</th>
+            <th>จำนวน<br />ผู้ประสบภัย</th>
+            <th>จำนวน<br />กลุ่มเปราะบาง</th>
+            <th>ถุง<br />ยังชีพ</th>
+            <th>ระดับ<br />ความเสียหาย</th>
+            <th>ความสามารถ<br />พึ่งพาตนเอง</th>
+            <th>ความลำบาก<br />เข้าถึงพื้นที่</th>
+            <th>ใช้พาหนะของ<br />ทอ. เท่านั้น</th>
+            <th>ระยะเวลา<br />ประสบภัย</th>
+            <th>ระดับ<br />ความรุนแรง</th>
+            <th>ความเสี่ยง<br />ที่อาจเกิดซ้ำ</th>
+            <th>ยานพาหนะ</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="table-button">
+        <button id="check-button" class="green-button">
+          ตรวจสอบการจัดส่ง
+        </button>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script> -->
+
+    <script type="module" src="../js/list.js"></script>
+  </body>
+</html>

@@ -54,7 +54,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       <thead>
         <tr>
           <th>ลำดับ</th>
-          <th>วันที่</th>
+          <th>วันที่สร้าง</th>
+          <th>วันที่จัดส่ง</th>
           <th>จัดส่งโดย</th>
           <th>จำนวน (ชุมชน)</th>
           
@@ -112,11 +113,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   let index = 1;
   querySnapshot.forEach((doc) => {
     const data = doc.data();
-    const formattedDate = formatThaiDate(data.timestamp);
+    if (!data.date) return;
+    const formattedDate1 = formatThaiDate(data.timestamp);
+    const formattedDate2 = formatThaiDate(data.date);
     html += `
       <tr class="data-row" data-id="${doc.id}">
         <td>${index++}</td>
-        <td>${formattedDate || "-"}</td>
+        <td>${formattedDate1 || "-"}</td>
+        <td>${formattedDate2 || "-"}</td>
         <td>${wingMap[data.wing] || "-"}</td>
         <td>${data._data.length || "-"}</td>
         

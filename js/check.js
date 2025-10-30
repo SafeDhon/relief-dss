@@ -200,7 +200,6 @@ document.getElementById("eventDate").addEventListener("change", async (e) => {
 });
 
 async function validateDateBeforeGo() {
-  const refID = sessionStorage.getItem("refID");
   if (!refID) {
     alert("ไม่พบข้อมูลอ้างอิง (refID)");
     return false;
@@ -220,15 +219,14 @@ async function validateDateBeforeGo() {
 
 document.getElementById("conclu-button").addEventListener("click", async () => {
   const ok = await validateDateBeforeGo();
-  if (!ok) return; // ถ้าไม่ผ่าน จะหยุดไม่ไปหน้าใหม่
+  if (!ok) return;
 
-  // ✅ ผ่านการตรวจสอบ → ไปหน้า conclusion
   window.location.href = `../pages/conclusion.html?refID=${encodeURIComponent(
     refID
   )}`;
 });
 
-// ปุ่มไปหน้า History
+
 const historyBtn = document.getElementById("historyBtn");
 historyBtn.addEventListener("click", () => {
   window.location.href = "../pages/history.html";

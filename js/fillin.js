@@ -488,7 +488,7 @@ function findMins(list) {
 
 function weight(list) {
   var weights = [
-    0.035, 0.261, 0.0435, 0.2745, 0.0044, 0.0312, 0.2445, 0.0849, 0.021,
+    0.0338, 0.2541, 0.0445, 0.2809, 0.0043, 0.0312, 0.2446, 0.0855, 0.0211,
   ];
   var weighted = [];
   for (let i = 0; i < list.length; i++) {

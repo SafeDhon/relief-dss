@@ -61,129 +61,6 @@ console.log(getData());
 
 const communities = getData();
 
-// const communities = [
-//   {
-//     address: "ชุมชน บ้านตลาดขวัญ",
-//     longitude: 100.506042,
-//     latitude: 13.841556,
-//     id: 1,
-//     score: 0.4507983633567712,
-//     victim: 500,
-//     survivalBag: 125,
-//     vehicle: 2,
-//   },
-//   {
-//     address: "ชุมชน เกาะหลัก",
-//     longitude: 99.802142,
-//     latitude: 11.796024,
-//     id: 2,
-//     score: 0.3987924750643096,
-//     victim: 200,
-//     survivalBag: 50,
-//     vehicle: 2,
-//   },
-//   {
-//     address: "ชุมชน ทับสะแก",
-//     longitude: 99.612759,
-//     latitude: 11.49773,
-//     id: 3,
-//     score: 0.39856813239088296,
-//     victim: 300,
-//     survivalBag: 75,
-//     vehicle: 2,
-//   },
-//   {
-//     address: "ชุมชน ไทยบ้านท่าหวี",
-//     longitude: 99.408125,
-//     latitude: 14.09826,
-//     id: 4,
-//     score: 0.3862964839005582,
-//     victim: 100,
-//     survivalBag: 25,
-//     vehicle: 2,
-//   },
-//   {
-//     address: "ชุมชน เมืองคลองท่อม",
-//     longitude: 99.14008,
-//     latitude: 7.933056,
-//     id: 5,
-//     score: 0.2517108744171783,
-//     victim: 150,
-//     survivalBag: 38,
-//     vehicle: 2,
-//   },
-//   {
-//     address: "ชุมชน 1",
-//     longitude: 103.055707,
-//     latitude: 15.41102,
-//     id: 6,
-//     score: 0.22895742177631578,
-//     victim: 250,
-//     survivalBag: 63,
-//     vehicle: 2,
-//   },
-//   {
-//     address: "ชุมชน 2",
-//     longitude: 103.055707,
-//     latitude: 15.41102,
-//     id: 7,
-//     score: 0.22895742177631578,
-//     victim: 250,
-//     survivalBag: 63,
-//     vehicle: 2,
-//   },
-//   {
-//     address: "ชุมชน 3",
-//     longitude: 103.055707,
-//     latitude: 15.41102,
-//     id: 8,
-//     score: 0.22895742177631578,
-//     victim: 250,
-//     survivalBag: 63,
-//     vehicle: 1,
-//   },
-//   {
-//     address: "ชุมชน 4",
-//     longitude: 103.055707,
-//     latitude: 15.41102,
-//     id: 9,
-//     score: 0.22895742177631578,
-//     victim: 250,
-//     survivalBag: 40,
-//     vehicle: 3,
-//   },
-//   {
-//     address: "ชุมชน 5",
-//     longitude: 103.055707,
-//     latitude: 15.41102,
-//     id: 10,
-//     score: 0.22895742177631578,
-//     victim: 250,
-//     survivalBag: 20,
-//     vehicle: 4,
-//   },
-//   {
-//     address: "ชุมชน 6",
-//     longitude: 103.055707,
-//     latitude: 15.41102,
-//     id: 11,
-//     score: 0.22895742177631578,
-//     victim: 250,
-//     survivalBag: 63,
-//     vehicle: 1,
-//   },
-//   {
-//     address: "ชุมชน 7",
-//     longitude: 103.055707,
-//     latitude: 15.41102,
-//     id: 12,
-//     score: 0.22895742177631578,
-//     victim: 250,
-//     survivalBag: 63,
-//     vehicle: 4,
-//   },
-// ];
-
 const vehicles = _vehicles;
 
 const communityTableContainer = document.getElementById(
@@ -241,9 +118,8 @@ function displayGroupedTable(filteredCommunities, vehicle) {
 
   groups.forEach((group, groupIndex) => {
     const groupTitle = document.createElement("h4");
-    groupTitle.textContent = `รอบที่ ${
-      groupIndex + 1
-    } (ไม่เกิน ${capacity} ถุง)`;
+    groupTitle.textContent = `รอบที่ ${groupIndex + 1
+      } (ไม่เกิน ${capacity} ถุง)`;
     communityTableContainer.appendChild(groupTitle);
 
     const table = document.createElement("table");
@@ -398,7 +274,9 @@ function displayAllCommunitiesInOneTable(communityList) {
         const url =
           vehicleId === "4"
             ? `../pages/route2.html?wing=${wing}&vehicle=${vehicleId}&group=${index}&ref=${ref}&data=${data}`
-            : `../pages/route1.html?wing=${wing}&vehicle=${vehicleId}&group=${index}&ref=${ref}&data=${data}`;
+            : vehicleId === "3"
+              ? `../pages/route3.html?wing=${wing}&vehicle=${vehicleId}&group=${index}&ref=${ref}&data=${data}`
+              : `../pages/route1.html?wing=${wing}&vehicle=${vehicleId}&group=${index}&ref=${ref}&data=${data}`;
 
         setTimeout(() => {
           window.open(url, "_blank");
@@ -502,7 +380,7 @@ function buildRouteData(communities, vehicles) {
   return result;
 }
 
-// เพิ่ม Event ให้ปุ่ม nav
+
 navButtons.forEach((button) => {
   button.addEventListener("click", () => {
     navButtons.forEach((btn) => btn.classList.remove("active"));
@@ -513,21 +391,9 @@ navButtons.forEach((button) => {
   });
 });
 
-// โหลดเริ่มต้น
+
 displayCommunities("all");
 
-// ปุ่มรวมทั้งหมด
-// const btnCal = document.getElementById("btnCal");
-// if (btnCal) {
-//   btnCal.addEventListener("click", () => {
-//     console.log("ข้อมูลชุมชนที่แสดงอยู่:", currentDisplayedCommunities);
-//     console.log("vehicleCode ที่เลือก:", _vehicleCode);
-//   });
-// } else {
-//   console.warn("ไม่พบปุ่มที่มี id='btnCal'");
-// }
-
-// ปุ่มไปหน้า History
 const historyBtn = document.getElementById("historyBtn");
 historyBtn.addEventListener("click", () => {
   window.location.href = "../pages/history.html";

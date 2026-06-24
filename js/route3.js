@@ -52,6 +52,9 @@ require([
   // const _points = sessionStorage.getItem("pointsData");
   let stopData = [];
   let cumulativeRouteArray = [];
+  let handledStopIds = new Set();
+  let lastBoatLaunchPoint = null;
+  let isPlacingAddBoatLaunch = false;
   // if (_points) {
   //   stopData = JSON.parse(_points);
   //   // console.log(stopData);
@@ -174,54 +177,6 @@ require([
 
   view.ui.add(titleInfo, "top-left");
 
-  // เก็บผลลัพธ์ของระยะทางและเวลาสำหรับทุกคู่จุด
-  // เปลี่ยนจาก Object ธรรมดาเป็น Array เพื่อให้ console.table แสดงผลดีขึ้น
-  const allPairwiseResultsArray = [];
-
-  function getRouteWithCumulativeDistance(
-    fastestRouteArray,
-    tempPairwiseResults,
-    stopData = []
-  ) {
-    const resultArray = [];
-    let cumulativeDistance = 0;
-
-    for (let i = 0; i < fastestRouteArray.length - 1; i++) {
-      const fromId = fastestRouteArray[i];
-      const toId = fastestRouteArray[i + 1];
-      const key = `${fromId}-${toId}`;
-      const segment = tempPairwiseResults[key];
-
-      // เช็ค stopData ก่อนใช้ .find
-      const fromStop = stopData.find?.((s) => s.id === fromId);
-      const toStop = stopData.find?.((s) => s.id === toId);
-
-      const fromAddress = fromStop ? fromStop.address : fromId;
-      const toAddress = toStop ? toStop.address : toId;
-
-      if (segment && segment.distance !== null) {
-        cumulativeDistance += segment.distance;
-        resultArray.push({
-          ลำดับ: i + 1,
-          ต้นทาง: fromAddress,
-          ปลายทาง: toAddress,
-          "ระยะทาง (กม.)": segment.distance,
-          "ระยะทางสะสม (กม.)": cumulativeDistance.toFixed(2),
-        });
-      } else {
-        resultArray.push({
-          ลำดับ: i + 1,
-          ต้นทาง: fromAddress,
-          ปลายทาง: toAddress,
-          "ระยะทาง (กม.)": "Error",
-          "ระยะทางรวมสะสม (กม.)": "Error",
-        });
-      }
-    }
-
-    return resultArray;
-  }
-
   // ฟังก์ชันสำหรับคำนวณเส้นทางระหว่างจุด 2 จุด
   async function solveRoute(startPoint, endPoint) {
     const stops = [
@@ -285,272 +240,17 @@ require([
     }
   }
 
-  // ฟังก์ชันหลักสำหรับคำนวณและแสดงผลลัพธ์
-  async function calculateAndDisplayAllRoutes() {
-    // ตรวจสอบ API Key
-    if (!apiKey || apiKey === "YOUR_API_KEY_HERE") {
-      console.error(
-        "โปรดระบุ ArcGIS API Key ของคุณในโค้ด JavaScript ก่อนใช้งาน"
-      );
-      return;
-    }
-
-    // ขั้นที่ 1: คำนวณระยะทางและเวลาสำหรับทุกคู่จุดที่เป็นไปได้
-    const tempPairwiseResults = {}; // ใช้ Object ชั่วคราวเพื่อเก็บผลลัพธ์ตาม key ก่อน
-    for (let i = 0; i < stopData.length; i++) {
-      for (let j = 0; j < stopData.length; j++) {
-        if (i === j) continue; // ไม่คำนวณจากจุดตัวเองไปจุดตัวเอง
-        const startPoint = stopData[i];
-        const endPoint = stopData[j];
-        const key = `${startPoint.id}-${endPoint.id}`;
-        console.log(
-          `กำลังคำนวณเส้นทางจาก ${startPoint.id} ถึง ${endPoint.id}...`
-        );
-        const result = await solveRoute(startPoint, endPoint);
-        tempPairwiseResults[key] = result;
-
-        // เพิ่มข้อมูลเข้า Array เพื่อนำไปแสดงผลใน console.table
-        allPairwiseResultsArray.push({
-          จากจุด: startPoint.id,
-          ไปยังจุด: endPoint.id,
-          "ระยะทาง (กม.)": result.distance !== null ? result.distance : "Error",
-          "เวลา (นาที)": result.time !== null ? result.time : "Error",
-        });
-      }
-    }
-
-    console.table(allPairwiseResultsArray); // แสดงผลในรูปแบบตาราง!
-
-    // ขั้นที่ 2: สร้างรายการเส้นทางทั้งหมดที่เป็นไปได้ (TSP จากจุด 1)
-    const pointsToVisit = stopData.filter((p) => p.id !== 1); // จุด 2, 3, 4
-    const permutations = getPermutations(pointsToVisit.map((p) => p.id)); // สร้าง permutations ของ ID
-
-    const finalRoutesData = [];
-
-    for (const p of permutations) {
-      const fullRouteIds = [1, ...p, 1]; // เช่น [1, 2, 3, 4, 1]
-      let totalDistance = 0;
-      let totalTime = 0;
-      let routePath = "";
-      let hasError = false;
-
-      for (let i = 0; i < fullRouteIds.length - 1; i++) {
-        const fromId = fullRouteIds[i];
-        const toId = fullRouteIds[i + 1];
-        const key = `${fromId}-${toId}`;
-        const pairResult = tempPairwiseResults[key]; // ใช้ tempPairwiseResults ที่เก็บ key-value
-
-        if (
-          pairResult &&
-          pairResult.distance !== null &&
-          pairResult.time !== null
-        ) {
-          totalDistance += pairResult.distance;
-          totalTime += pairResult.time;
-        } else {
-          hasError = true;
-          break; // ถ้ามีข้อผิดพลาดใน segment ใด ให้ข้ามเส้นทางนี้
-        }
-
-        routePath += `${fromId} -> `;
-      }
-
-      if (hasError) {
-        finalRoutesData.push({
-          เส้นทาง: `${fullRouteIds.join(" -> ")} (มีข้อผิดพลาดบางส่วน)`,
-          "ระยะทาง (กม.)": "Error",
-          "เวลา (นาที)": "Error",
-        });
-      } else {
-        routePath += "1"; // เพิ่มจุดสุดท้าย
-        finalRoutesData.push({
-          เส้นทาง: routePath,
-          "ระยะทาง (กม.)": totalDistance.toFixed(2),
-          "เวลา (นาที)": totalTime.toFixed(3),
-        });
-      }
-    }
-
-    console.table(finalRoutesData); // ยังคงแสดงใน console เพื่อตรวจสอบ
-
-    // หาเส้นทางที่ใช้เวลาน้อยที่สุด
-    const validRoutes = finalRoutesData.filter(
-      (r) => r["เวลา (นาที)"] !== "Error"
+  function drawBaseMarker() {
+    const base = stopData[0];
+    if (!base) return;
+    stopsLayer.add(
+      new Graphic({
+        geometry: { type: "point", longitude: base.long, latitude: base.lat },
+        symbol: { type: "simple-marker", color: [0, 128, 0, 1], size: "25px", outline: { color: [255, 255, 255], width: 1 } },
+        attributes: { id: base.id },
+        popupTemplate: { title: base.address, content: "" },
+      })
     );
-
-    // แปลงเวลาเป็นตัวเลขสำหรับเปรียบเทียบ
-    const sortedByTime = validRoutes.sort(
-      (a, b) => parseFloat(a["เวลา (นาที)"]) - parseFloat(b["เวลา (นาที)"])
-    );
-
-    if (sortedByTime.length > 0) {
-      const fastestRoute = sortedByTime[0];
-      const fastestRouteArray = fastestRoute.เส้นทาง
-        .split(" -> ")
-        .map((s) => parseInt(s));
-
-      console.log("\n✅ เส้นทางที่ใช้เวลาน้อยที่สุด:");
-      console.log(`เส้นทาง (array):`, fastestRouteArray);
-      console.log(
-        `เวลา: ${fastestRoute["เวลา (นาที)"]} นาที, ระยะทาง: ${fastestRoute["ระยะทาง (กม.)"]} กม.`
-      );
-
-      cumulativeRouteArray = getRouteWithCumulativeDistance(
-        fastestRouteArray,
-        tempPairwiseResults,
-        stopData
-      );
-      console.table(cumulativeRouteArray);
-
-      const container = document.getElementById("routeTableContainer");
-      if (container) {
-        container.innerHTML = ""; // ล้างตารางเก่า
-
-        let html = `
-  <table>
-    <colgroup>
-      <col style="width:8%">
-      <col style="width:32%">
-      <col style="width:32%">
-      <col style="width:14%">
-      <col style="width:14%">
-    </colgroup>
-    <thead><tr>
-`;
-        Object.keys(cumulativeRouteArray[0]).forEach((key) => {
-          html += `<th>${key}</th>`;
-        });
-        html += "</tr></thead><tbody>";
-
-        cumulativeRouteArray.forEach((row) => {
-          html += "<tr>";
-          Object.values(row).forEach((val) => {
-            html += `<td>${val}</td>`;
-          });
-          html += "</tr>";
-        });
-
-        html += "</tbody></table>";
-        container.innerHTML = html;
-      }
-
-      // วาดเส้นทางเดินรถจริง
-      view.graphics.removeAll(); // ล้างกราฟิกเดิม
-
-      let routeGeometries = []; // เก็บ geometry ของแต่ละ segment
-
-      for (let i = 0; i < fastestRouteArray.length - 1; i++) {
-        const fromId = fastestRouteArray[i];
-        const toId = fastestRouteArray[i + 1];
-        const key = `${fromId}-${toId}`;
-        const segment = tempPairwiseResults[key];
-
-        if (segment && segment.geometry) {
-          routeGeometries.push(segment.geometry);
-        }
-      }
-
-      // วาดแต่ละ segment แยกกัน (ง่ายและชัด)
-      routeGeometries.forEach((geom) => {
-        routesLayer.add(
-          new Graphic({
-            geometry: geom,
-            symbol: {
-              type: "simple-line",
-              color: [0, 122, 255, 0.8],
-              width: 4,
-            },
-          })
-        );
-      });
-
-      fastestRouteArray.forEach((id, index) => {
-        // ข้ามจุดสุดท้ายถ้าไม่อยากให้ซ้ำ
-        if (index === fastestRouteArray.length - 1) return;
-
-        const stop = stopData.find((s) => s.id === id);
-        if (!stop) return;
-
-        const isFirst = index === 0;
-        const color = isFirst ? [0, 128, 0, 1] : [255, 165, 0, 1];
-
-        // วาด marker
-        stopsLayer.add(
-          new Graphic({
-            geometry: {
-              type: "point",
-              longitude: stop.long,
-              latitude: stop.lat,
-            },
-            symbol: {
-              type: "simple-marker",
-              color: color,
-              size: "25px",
-              outline: {
-                color: [255, 255, 255],
-                width: 1,
-              },
-            },
-            attributes: {
-              id: stop.id,
-            },
-            popupTemplate: {
-              title: `${stop.address}`,
-              content:
-                stop.id !== 1
-                  ? `
-        <b>ผู้ประสบภัย:</b> ${stop.victim} ราย<br>
-        <b>ถุงยังชีพ:</b> ${stop.bags} ถุง
-      `
-                  : "",
-            },
-          })
-        );
-
-        // ถ้าไม่ใช่จุดแรก ให้เพิ่มตัวเลข (index+1) ในวงกลมสีฟ้า
-        if (!isFirst) {
-          stopsLayer.add(
-            new Graphic({
-              geometry: {
-                type: "point",
-                longitude: stop.long,
-                latitude: stop.lat,
-              },
-              symbol: {
-                type: "text",
-                text: index.toString(), // เริ่มจาก index=1 จะได้ "1", "2", ...
-                color: "white",
-                font: {
-                  size: 10,
-                  weight: "bold",
-                },
-                yoffset: -2, // ปรับให้ตัวเลขอยู่ตรงกลาง
-              },
-            })
-          );
-        }
-      });
-    } else {
-      console.log("❌ ไม่พบเส้นทางที่คำนวณเวลาสำเร็จ");
-    }
-  }
-
-  // Helper function เพื่อสร้าง permutation (จาก Stack Overflow)
-  function getPermutations(arr) {
-    const result = [];
-    function permute(arr, l, r) {
-      if (l === r) {
-        result.push([...arr]);
-      } else {
-        for (let i = l; i <= r; i++) {
-          [arr[l], arr[i]] = [arr[i], arr[l]]; // Swap
-          permute(arr, l + 1, r);
-          [arr[l], arr[i]] = [arr[i], arr[l]]; // Backtrack
-        }
-      }
-    }
-    permute(arr, 0, arr.length - 1);
-    return result;
   }
 
   // แสดงเฉพาะจุดบนแผนที่ ยังไม่คำนวณเส้นทาง
@@ -599,9 +299,9 @@ require([
   });
 
   view.ui.add(document.getElementById("buttonDiv5"), "top-trailing");
+  view.ui.add(document.getElementById("buttonDiv6"), "top-trailing");
   view.ui.add(document.getElementById("buttonDiv4"), "top-trailing");
-  view.ui.add(document.getElementById("buttonDiv3"), "top-trailing");
-  view.ui.add(document.getElementById("buttonDiv1"), "bottom-trailing");
+view.ui.add(document.getElementById("buttonDiv1"), "bottom-trailing");
 
   const sketchVM = new SketchViewModel({
     view: view,
@@ -628,63 +328,422 @@ require([
     }
   });
 
-  document.getElementById("recalculateRoute").addEventListener("click", () => {
-    routesLayer.removeAll();
-    calculateAndDisplayAllRoutes();
-  });
-
-  let isPlacingBoatLaunch = false;
+let isPlacingBoatLaunch = false;
   let boatLaunchPoint = null;
 
-  async function calculateBoatRoutes() {
-    if (!boatLaunchPoint) return;
+  function getPolylineMidpoint(geom) {
+    if (!geom?.paths?.[0]?.length) return null;
+    const path = geom.paths[0];
+    const mid = path[Math.floor(path.length / 2)];
+    return { longitude: mid[0], latitude: mid[1] };
+  }
 
-    const communityStops = stopData.filter((s) => s.id !== 1);
+  async function calculateBoatRoutes(launchPt, targetStops, isAdditional = false) {
+    if (!launchPt || targetStops.length === 0) return;
 
-    // จุดปล่อยเรือ ↔ ทุกชุมชน — เลือกทิศที่ระยะทางสั้นกว่า
-    const boatRows = [];
-    for (const stop of communityStops) {
-      const r1 = await solveRoute(boatLaunchPoint, stop);
-      const r2 = await solveRoute(stop, boatLaunchPoint);
-      const d1 = r1.distance ?? Infinity;
-      const d2 = r2.distance ?? Infinity;
-      const shorter = d1 <= d2 ? r1 : r2;
-      boatRows.push({
-        จากจุด: d1 <= d2 ? "จุดปล่อยเรือ" : stop.address,
-        ไปยังจุด: d1 <= d2 ? stop.address : "จุดปล่อยเรือ",
-        "ถุงยังชีพ (ถุง)": stop.bags,
-        "ระยะทาง (กม.)": shorter.distance ?? "Error",
-        "เวลา (นาที)": shorter.time ?? "Error",
-      });
+    // Step 1: ระยะทางจาก/ถึงจุดปล่อยเรือ เลือกทิศที่สั้นกว่าเป็นเส้นทางหลัก
+    const launchToStop = {};
+    const stopToLaunch = {};
+    for (const stop of targetStops) {
+      launchToStop[stop.id] = await solveRoute(launchPt, stop);
+      stopToLaunch[stop.id] = await solveRoute(stop, launchPt);
     }
-    console.log("=== เส้นทางจุดปล่อยเรือ ↔ ชุมชน ===");
-    console.table(boatRows);
 
-    // ระหว่างชุมชน — แต่ละคู่ไม่ซ้ำ เลือกทิศที่ระยะทางสั้นกว่า
-    const communityRows = [];
-    for (let i = 0; i < communityStops.length; i++) {
-      for (let j = i + 1; j < communityStops.length; j++) {
-        const a = communityStops[i];
-        const b = communityStops[j];
-        const r1 = await solveRoute(a, b);
-        const r2 = await solveRoute(b, a);
-        const d1 = r1.distance ?? Infinity;
-        const d2 = r2.distance ?? Infinity;
-        const shorter = d1 <= d2 ? r1 : r2;
-        const fromStop = d1 <= d2 ? a : b;
-        const toStop = d1 <= d2 ? b : a;
-        communityRows.push({
-          จากจุด: fromStop.address,
-          ไปยังจุด: toStop.address,
-          "ถุงยังชีพ ต้นทาง (ถุง)": fromStop.bags,
-          "ถุงยังชีพ ปลายทาง (ถุง)": toStop.bags,
-          "ระยะทาง (กม.)": shorter.distance ?? "Error",
-          "เวลา (นาที)": shorter.time ?? "Error",
+    const bestRoute = {};
+    for (const stop of targetStops) {
+      const d1 = launchToStop[stop.id]?.distance ?? Infinity;
+      const d2 = stopToLaunch[stop.id]?.distance ?? Infinity;
+      bestRoute[stop.id] = d1 <= d2 ? launchToStop[stop.id] : stopToLaunch[stop.id];
+    }
+
+    console.log("=== ระยะทางจุดปล่อยเรือ ↔ ชุมชน ===");
+    console.table(
+      targetStops.map((stop) => ({
+        ชุมชน: stop.address,
+        "ถุงยังชีพ (ถุง)": stop.bags,
+        "ระยะทาง (กม.)": bestRoute[stop.id]?.distance ?? "Error",
+      }))
+    );
+
+    // Step 2: แบ่ง okStops (≤5 กม.) และ tooFar (>5 กม.)
+    const tooFarIds = new Set(
+      targetStops
+        .filter((s) => (bestRoute[s.id]?.distance ?? Infinity) > 5)
+        .map((s) => s.id)
+    );
+    const okStops = targetStops.filter((s) => !tooFarIds.has(s.id));
+
+    // วาด marker ทันที
+    if (isAdditional) {
+      // ลบเฉพาะ marker ของ targetStops เท่านั้น (ไม่แตะ marker จุดปล่อยเรือก่อนหน้า)
+      const targetIds = new Set(targetStops.map((s) => s.id));
+      stopsLayer.graphics
+        .filter((g) => targetIds.has(g.attributes?.stopId))
+        .toArray()
+        .forEach((g) => stopsLayer.remove(g));
+    } else {
+      stopsLayer.removeAll();
+      drawBaseMarker();
+    }
+
+    let okIdx = 0;
+    targetStops.forEach((stop) => {
+      const isOver = tooFarIds.has(stop.id);
+      stopsLayer.add(
+        new Graphic({
+          geometry: { type: "point", longitude: stop.long, latitude: stop.lat },
+          attributes: { stopId: stop.id },
+          symbol: {
+            type: "simple-marker",
+            color: isOver ? [211, 47, 47, 1] : [255, 165, 0, 1],
+            size: "25px",
+            outline: { color: [255, 255, 255], width: 1 },
+          },
+          popupTemplate: {
+            title: stop.address,
+            content:
+              `<b>ผู้ประสบภัย:</b> ${stop.victim} ราย<br><b>ถุงยังชีพ:</b> ${stop.bags} ถุง` +
+              (isOver ? `<br><b style="color:#d32f2f">ห่างเกิน 5 กม. — ให้เลือกจุดปล่อยเรือจุดต่อไป</b>` : ""),
+          },
+        })
+      );
+      if (!isOver) {
+        okIdx++;
+        stopsLayer.add(
+          new Graphic({
+            geometry: { type: "point", longitude: stop.long, latitude: stop.lat },
+            attributes: { stopId: stop.id },
+            symbol: {
+              type: "text",
+              text: String(okIdx),
+              color: "white",
+              font: { size: 10, weight: "bold" },
+              yoffset: -2,
+            },
+          })
+        );
+      }
+    });
+
+    if (okStops.length === 0) return;
+
+    // บันทึกชุมชนที่จะถูกจัดการในรอบนี้เข้า handledStopIds ทันที
+    okStops.forEach((s) => handledStopIds.add(s.id));
+
+    // Step 3: ระยะทางระหว่างชุมชน okStops ทุกคู่ (ทั้งสองทิศทาง)
+    const stopToStop = {};
+    for (let i = 0; i < okStops.length; i++) {
+      for (let j = 0; j < okStops.length; j++) {
+        if (i === j) continue;
+        const a = okStops[i];
+        const b = okStops[j];
+        stopToStop[`${a.id}-${b.id}`] = await solveRoute(a, b);
+      }
+    }
+
+    // Step 4: สร้างรายการงานส่ง — แบ่งชุมชนที่ต้องการ >30 ถุงออกเป็นหลาย task
+    const tasks = [];
+    for (const stop of okStops) {
+      let remaining = stop.bags;
+      while (remaining > 0) {
+        tasks.push({ stop, bags: Math.min(remaining, 30) });
+        remaining -= 30;
+      }
+    }
+
+    // Step 5: วางแผนรอบส่งแบบ Greedy — ตามลำดับความสำคัญ, ≤30 ถุง + ≤10 กม. ต่อรอบ
+    const rounds = [];
+    let taskIdx = 0;
+
+    while (taskIdx < tasks.length) {
+      const roundEntries = [];
+      let totalBags = 0;
+      let totalDist = 0;
+      let lastStop = null;
+
+      while (taskIdx < tasks.length) {
+        const task = tasks[taskIdx];
+        const stop = task.stop;
+        let distToStop, backDist, oldReturn;
+
+        if (!lastStop) {
+          distToStop = bestRoute[stop.id]?.distance ?? Infinity;
+          backDist = bestRoute[stop.id]?.distance ?? Infinity;
+          oldReturn = 0;
+        } else {
+          distToStop = stopToStop[`${lastStop.id}-${stop.id}`]?.distance ?? Infinity;
+          backDist = bestRoute[stop.id]?.distance ?? Infinity;
+          oldReturn = bestRoute[lastStop.id]?.distance ?? Infinity;
+        }
+
+        // ระยะรวมรอบนี้ = เส้นทางเดิม - ขากลับเก่า + ขาไปจุดใหม่ + ขากลับจุดใหม่
+        const newDist = totalDist - oldReturn + distToStop + backDist;
+        const newBags = totalBags + task.bags;
+
+        if (newDist <= 10 && newBags <= 30) {
+          roundEntries.push({ task, distFromPrev: distToStop });
+          totalDist = newDist;
+          totalBags = newBags;
+          lastStop = stop;
+          taskIdx++;
+        } else {
+          break;
+        }
+      }
+
+      if (roundEntries.length > 0) {
+        rounds.push({ entries: roundEntries, totalDist, totalBags });
+      } else {
+        taskIdx++;
+      }
+    }
+
+    // แสดงตารางแผนการเดินทางใน console
+    const visitCount = {};
+    for (const round of rounds) {
+      for (const { task } of round.entries) {
+        visitCount[task.stop.id] = (visitCount[task.stop.id] || 0) + 1;
+      }
+    }
+
+    const planTable = [];
+    let seq = 1;
+    for (let ri = 0; ri < rounds.length; ri++) {
+      const { entries } = rounds[ri];
+      let prevName = "จุดปล่อยเรือ";
+      let prevStop = null;
+
+      for (const { task, distFromPrev } of entries) {
+        const stop = task.stop;
+        const destName =
+          visitCount[stop.id] > 1
+            ? `${stop.address} (รอบที่ ${ri + 1})`
+            : stop.address;
+
+        planTable.push({
+          ลำดับ: seq++,
+          ต้นทาง: prevName,
+          ปลายทาง: destName,
+          "ระยะทาง (กม.)": parseFloat(distFromPrev.toFixed(2)),
+          "ถุงยังชีพ (ถุง)": task.bags,
+        });
+
+        prevName = destName;
+        prevStop = stop;
+      }
+
+      if (prevStop) {
+        const retDist = bestRoute[prevStop.id]?.distance ?? null;
+        planTable.push({
+          ลำดับ: seq++,
+          ต้นทาง: prevName,
+          ปลายทาง: "จุดปล่อยเรือ",
+          "ระยะทาง (กม.)": retDist !== null ? parseFloat(retDist.toFixed(2)) : "Error",
+          "ถุงยังชีพ (ถุง)": "-",
         });
       }
     }
-    console.log("=== เส้นทางระหว่างชุมชน ===");
-    console.table(communityRows);
+
+    console.log("=== แผนการเดินทางเรือ ===");
+    console.table(planTable);
+
+    // Step 6: วาดเส้นทาง (แต่ละรอบต่างสี) และ marker พร้อมลำดับ
+    if (!isAdditional) {
+      routesLayer.removeAll();
+      stopsLayer.removeAll();
+      drawBaseMarker();
+      cumulativeRouteArray = [];
+    } else {
+      // ลบ marker ชั่วคราว (ส้ม) ของ okStops ก่อนวาดทับด้วยสีรอบ
+      const okIds = new Set(okStops.map((s) => s.id));
+      stopsLayer.graphics
+        .filter((g) => okIds.has(g.attributes?.stopId))
+        .toArray()
+        .forEach((g) => stopsLayer.remove(g));
+    }
+
+    // วาด marker แดงของชุมชนที่ห่างเกิน (เฉพาะ batch นี้)
+    targetStops
+      .filter((s) => tooFarIds.has(s.id))
+      .forEach((stop) => {
+        stopsLayer.add(
+          new Graphic({
+            geometry: { type: "point", longitude: stop.long, latitude: stop.lat },
+            attributes: { stopId: stop.id },
+            symbol: {
+              type: "simple-marker",
+              color: [211, 47, 47, 1],
+              size: "25px",
+              outline: { color: [255, 255, 255], width: 1 },
+            },
+            popupTemplate: {
+              title: stop.address,
+              content: `<b>ผู้ประสบภัย:</b> ${stop.victim} ราย<br><b>ถุงยังชีพ:</b> ${stop.bags} ถุง<br><b style="color:#d32f2f">ห่างเกิน 5 กม. — ให้เลือกจุดปล่อยเรือจุดต่อไป</b>`,
+            },
+          })
+        );
+      });
+
+    const roundColors = [
+      [0, 122, 255, 0.9],
+      [255, 87, 34, 0.9],
+      [76, 175, 80, 0.9],
+      [156, 39, 176, 0.9],
+      [255, 193, 7, 0.9],
+    ];
+
+    let globalOrder = cumulativeRouteArray.length + 1;
+
+    for (let ri = 0; ri < rounds.length; ri++) {
+      const { entries } = rounds[ri];
+      const color = roundColors[ri % roundColors.length];
+      let lastStop = null;
+      let cumulDist = 0;
+      let isFirstSeg = true;
+
+      for (const { task, distFromPrev } of entries) {
+        const stop = task.stop;
+
+        // วาดเส้นทางขาไป
+        const geom = !lastStop
+          ? bestRoute[stop.id]?.geometry
+          : stopToStop[`${lastStop.id}-${stop.id}`]?.geometry;
+        if (geom) {
+          routesLayer.add(
+            new Graphic({
+              geometry: geom,
+              symbol: { type: "simple-line", color, width: 4 },
+            })
+          );
+
+          // วาดป้ายหมายเลขรอบที่กึ่งกลางเส้นแรกของรอบ
+          if (isFirstSeg) {
+            const mid = getPolylineMidpoint(geom);
+            if (mid) {
+              routesLayer.add(
+                new Graphic({
+                  geometry: { type: "point", ...mid },
+                  symbol: {
+                    type: "simple-marker",
+                    color,
+                    size: "22px",
+                    outline: { color: [255, 255, 255], width: 2 },
+                  },
+                })
+              );
+              routesLayer.add(
+                new Graphic({
+                  geometry: { type: "point", ...mid },
+                  symbol: {
+                    type: "text",
+                    text: String(ri + 1),
+                    color: "white",
+                    font: { size: 10, weight: "bold" },
+                    yoffset: -2,
+                  },
+                })
+              );
+            }
+            isFirstSeg = false;
+          }
+        }
+
+        cumulDist += distFromPrev;
+
+        cumulativeRouteArray.push({
+          รอบ: ri + 1,
+          ลำดับ: globalOrder,
+          ปลายทาง: stop.address,
+          "ถุงยังชีพ (ถุง)": task.bags,
+          "ระยะทาง (กม.)": parseFloat(distFromPrev.toFixed(2)),
+          "ระยะทางสะสม (กม.)": parseFloat(cumulDist.toFixed(2)),
+        });
+
+        // วาด marker ชุมชน
+        stopsLayer.add(
+          new Graphic({
+            geometry: { type: "point", longitude: stop.long, latitude: stop.lat },
+            symbol: {
+              type: "simple-marker",
+              color,
+              size: "25px",
+              outline: { color: [255, 255, 255], width: 1 },
+            },
+            popupTemplate: {
+              title: stop.address,
+              content: `<b>ผู้ประสบภัย:</b> ${stop.victim} ราย<br><b>ถุงยังชีพ:</b> ${stop.bags} ถุง<br><b>รอบที่:</b> ${ri + 1}`,
+            },
+          })
+        );
+
+        // วาดลำดับการส่งที่จุดชุมชน
+        stopsLayer.add(
+          new Graphic({
+            geometry: { type: "point", longitude: stop.long, latitude: stop.lat },
+            symbol: {
+              type: "text",
+              text: String(globalOrder),
+              color: "white",
+              font: { size: 10, weight: "bold" },
+              yoffset: -2,
+            },
+          })
+        );
+
+        lastStop = stop;
+        globalOrder++;
+      }
+
+      // วาดเส้นขากลับ (เส้นประ)
+      if (lastStop) {
+        const retGeom = bestRoute[lastStop.id]?.geometry;
+        if (retGeom) {
+          routesLayer.add(
+            new Graphic({
+              geometry: retGeom,
+              symbol: { type: "simple-line", color, width: 3, style: "dash" },
+            })
+          );
+        }
+      }
+    }
+
+    // Step 7: แสดงตารางสรุปเส้นทาง
+    const container = document.getElementById("routeTableContainer");
+    if (container && cumulativeRouteArray.length > 0) {
+      let html =
+        "<table><colgroup>" +
+        "<col style='width:8%'><col style='width:8%'><col style='width:32%'>" +
+        "<col style='width:16%'><col style='width:18%'><col style='width:18%'>" +
+        "</colgroup><thead><tr>" +
+        "<th>รอบ</th><th>ลำดับ</th><th>ปลายทาง</th>" +
+        "<th>ถุงยังชีพ (ถุง)</th><th>ระยะทาง (กม.)</th><th>ระยะทางสะสม (กม.)</th>" +
+        "</tr></thead><tbody>";
+      cumulativeRouteArray.forEach((row) => {
+        html += `<tr><td>${row.รอบ}</td><td>${row.ลำดับ}</td><td>${row.ปลายทาง}</td><td>${row["ถุงยังชีพ (ถุง)"]}</td><td>${row["ระยะทาง (กม.)"]}</td><td>${row["ระยะทางสะสม (กม.)"]}</td></tr>`;
+      });
+      html += "</tbody></table>";
+      container.innerHTML = html;
+    }
+
+    console.log(`=== แผนการส่งเรือ: ${rounds.length} รอบ ===`);
+    console.table(cumulativeRouteArray);
+  }
+
+  async function drawReturnToBaseIfComplete() {
+    const allCommunities = stopData.filter((s) => s.id !== 1);
+    const allServed = allCommunities.every((s) => handledStopIds.has(s.id));
+    if (!allServed || !lastBoatLaunchPoint) return;
+
+    const result = await solveRoute(lastBoatLaunchPoint, stopData[0]);
+    if (result?.geometry) {
+      boatLaunchLayer.add(
+        new Graphic({
+          geometry: result.geometry,
+          symbol: { type: "simple-line", color: [211, 47, 47, 1], width: 3 },
+        })
+      );
+    }
   }
 
   document.getElementById("setBoatLaunchPoint").addEventListener("click", () => {
@@ -702,61 +761,92 @@ require([
   });
 
   view.on("click", async (event) => {
-    if (!isPlacingBoatLaunch) return;
+    const placingFirst = isPlacingBoatLaunch;
+    const placingAdd = isPlacingAddBoatLaunch;
+    if (!placingFirst && !placingAdd) return;
 
     // ออกจากโหมดทันที
     isPlacingBoatLaunch = false;
-    const btn = document.getElementById("setBoatLaunchPoint");
-    btn.textContent = "กำหนดจุดปล่อยเรือ";
-    btn.style.backgroundColor = "#d32f2f";
+    isPlacingAddBoatLaunch = false;
     view.container.style.cursor = "default";
+    document.getElementById("setBoatLaunchPoint").textContent = "กำหนดจุดปล่อยเรือ";
+    document.getElementById("setBoatLaunchPoint").style.backgroundColor = "#d32f2f";
+    document.getElementById("addBoatLaunchPoint").textContent = "เพิ่มจุดปล่อยเรือ";
+    document.getElementById("addBoatLaunchPoint").style.backgroundColor = "#1565c0";
 
-    boatLaunchLayer.removeAll();
-
-    // วาง marker จุดปล่อยเรือก่อนรอผล
-    boatLaunchLayer.add(
-      new Graphic({
-        geometry: event.mapPoint,
-        symbol: {
-          type: "simple-marker",
-          color: [211, 47, 47, 1],
-          size: "25px",
-          style: "diamond",
-          outline: { color: [255, 255, 255], width: 2 },
-        },
-        popupTemplate: {
-          title: "จุดปล่อยเรือ",
-          content: `ละติจูด: ${event.mapPoint.latitude.toFixed(5)}<br>ลองจิจูด: ${event.mapPoint.longitude.toFixed(5)}`,
-        },
-      })
-    );
-
-    // เก็บตำแหน่งจุดปล่อยเรือ
-    boatLaunchPoint = {
+    const newPoint = {
       id: "boat",
-      address: "จุดปล่อยเรือ",
+      address: placingFirst ? "จุดปล่อยเรือ" : `จุดปล่อยเรือ ${2}`,
       lat: event.mapPoint.latitude,
       long: event.mapPoint.longitude,
     };
 
-    // วาดเส้นทางตามถนนจากฐานไปยังจุดปล่อยเรือ
-    const result = await solveRoute(stopData[0], boatLaunchPoint);
+    if (placingFirst) {
+      // รีเซ็ตสถานะทั้งหมด
+      boatLaunchLayer.removeAll();
+      routesLayer.removeAll();
+      stopsLayer.removeAll();
+      cumulativeRouteArray = [];
+      handledStopIds = new Set();
 
-    if (result && result.geometry) {
+      boatLaunchPoint = newPoint;
+      lastBoatLaunchPoint = newPoint;
+
       boatLaunchLayer.add(
         new Graphic({
-          geometry: result.geometry,
-          symbol: {
-            type: "simple-line",
-            color: [211, 47, 47, 1],
-            width: 3,
-          },
+          geometry: event.mapPoint,
+          symbol: { type: "simple-marker", color: [211, 47, 47, 1], size: "25px", style: "diamond", outline: { color: [255, 255, 255], width: 2 } },
+          popupTemplate: { title: "จุดปล่อยเรือ", content: `ละติจูด: ${event.mapPoint.latitude.toFixed(5)}<br>ลองจิจูด: ${event.mapPoint.longitude.toFixed(5)}` },
         })
       );
-    }
 
-    // คำนวณเส้นทางทั้งหมดที่เกี่ยวกับจุดปล่อยเรือ
-    await calculateBoatRoutes();
+      const result = await solveRoute(stopData[0], newPoint);
+      if (result?.geometry) {
+        boatLaunchLayer.add(new Graphic({ geometry: result.geometry, symbol: { type: "simple-line", color: [211, 47, 47, 1], width: 3 } }));
+      }
+
+      const allCommunities = stopData.filter((s) => s.id !== 1);
+      await calculateBoatRoutes(newPoint, allCommunities, false);
+      await drawReturnToBaseIfComplete();
+
+    } else {
+      // เพิ่มจุดปล่อยเรือ — วาดเส้นแดงจากจุดก่อนหน้ามายังจุดใหม่
+      boatLaunchLayer.add(
+        new Graphic({
+          geometry: event.mapPoint,
+          symbol: { type: "simple-marker", color: [211, 47, 47, 1], size: "25px", style: "diamond", outline: { color: [255, 255, 255], width: 2 } },
+          popupTemplate: { title: "จุดปล่อยเรือเพิ่มเติม", content: `ละติจูด: ${event.mapPoint.latitude.toFixed(5)}<br>ลองจิจูด: ${event.mapPoint.longitude.toFixed(5)}` },
+        })
+      );
+
+      if (lastBoatLaunchPoint) {
+        const link = await solveRoute(lastBoatLaunchPoint, newPoint);
+        if (link?.geometry) {
+          boatLaunchLayer.add(new Graphic({ geometry: link.geometry, symbol: { type: "simple-line", color: [211, 47, 47, 1], width: 3 } }));
+        }
+      }
+
+      lastBoatLaunchPoint = newPoint;
+
+      const remaining = stopData.filter((s) => s.id !== 1 && !handledStopIds.has(s.id));
+      await calculateBoatRoutes(newPoint, remaining, true);
+      await drawReturnToBaseIfComplete();
+    }
+  });
+
+  document.getElementById("addBoatLaunchPoint").addEventListener("click", () => {
+    isPlacingAddBoatLaunch = !isPlacingAddBoatLaunch;
+    const btn = document.getElementById("addBoatLaunchPoint");
+    if (isPlacingAddBoatLaunch) {
+      btn.textContent = "กำลังเลือกจุด... (คลิกเพื่อยกเลิก)";
+      btn.style.backgroundColor = "#0d3b7a";
+      view.container.style.cursor = "crosshair";
+      isPlacingBoatLaunch = false;
+    } else {
+      btn.textContent = "เพิ่มจุดปล่อยเรือ";
+      btn.style.backgroundColor = "#1565c0";
+      view.container.style.cursor = "default";
+    }
   });
 
   document.getElementById("saveRoute").addEventListener("click", async () => {

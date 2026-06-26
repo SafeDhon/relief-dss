@@ -10,7 +10,6 @@ require([
   "esri/rest/support/FeatureSet",
   "esri/widgets/Sketch/SketchViewModel",
   "esri/layers/GraphicsLayer",
-  "esri/rest/support/PolylineBarrier",
   "esri/widgets/Expand",
 ], function (
   esriConfig,
@@ -24,7 +23,6 @@ require([
   FeatureSet,
   SketchViewModel,
   GraphicsLayer,
-  PolylineBarrier,
   Expand
 ) {
   // const apiKey =
@@ -245,18 +243,9 @@ require([
       stops: new FeatureSet({
         features: stops,
       }),
-      // polylineBarriers: new FeatureSet({
-      //   features: customPolylineBarriers.map(
-      //     (b) => new Graphic({ geometry: b.geometry })
-      //   ),
-      // }),
-      polylineBarriers: new FeatureSet({
+      polygonBarriers: new FeatureSet({
         features: customPolylineBarriers.map(
-          (b) =>
-            new PolylineBarrier({
-              geometry: b.geometry,
-              barrierType: "restriction", // 🚫 ห้ามผ่าน
-            })
+          (b) => new Graphic({ geometry: b.geometry, attributes: { Barrier_Type: 0 } })
         ),
       }),
 
@@ -572,17 +561,17 @@ require([
   const sketchVM = new SketchViewModel({
     view: view,
     layer: drawnPolylineBarrierLayer,
-    polylineSymbol: {
-      type: "simple-line",
-      color: [255, 0, 0, 0.7], // สีแดง
-      width: "4px",
+    polygonSymbol: {
+      type: "simple-fill",
+      color: [255, 0, 0, 0.3],
+      outline: { color: [255, 0, 0, 0.9], width: 2 },
     },
   });
 
   document
     .getElementById("drawPolylineBarrier")
     .addEventListener("click", () => {
-      sketchVM.create("polyline");
+      sketchVM.create("polygon");
     });
 
   sketchVM.on("create", async (event) => {

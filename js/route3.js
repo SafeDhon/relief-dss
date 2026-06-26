@@ -211,7 +211,7 @@ require([
       stops: new FeatureSet({
         features: stops,
       }),
-      polylineBarriers: new FeatureSet({
+      polygonBarriers: new FeatureSet({
         features: barrierFeatures,
       }),
       returnDirections: false,
@@ -314,17 +314,17 @@ view.ui.add(document.getElementById("buttonDiv1"), "bottom-trailing");
   const sketchVM = new SketchViewModel({
     view: view,
     layer: drawnPolylineBarrierLayer,
-    polylineSymbol: {
-      type: "simple-line",
-      color: [255, 0, 0, 0.7], // สีแดง
-      width: "4px",
+    polygonSymbol: {
+      type: "simple-fill",
+      color: [255, 0, 0, 0.3],
+      outline: { color: [255, 0, 0, 0.9], width: 2 },
     },
   });
 
   document
     .getElementById("drawPolylineBarrier")
     .addEventListener("click", () => {
-      sketchVM.create("polyline");
+      sketchVM.create("polygon");
     });
 
   sketchVM.on("create", (event) => {
@@ -332,8 +332,8 @@ view.ui.add(document.getElementById("buttonDiv1"), "bottom-trailing");
       const geom = event.graphic.geometry;
       // แปลงจาก Web Mercator (102100) → WGS84 (4326) ให้ตรงกับ SR ของ stops ที่ส่งให้ route service
       const geoGeom = webMercatorUtils.webMercatorToGeographic(geom);
-      console.log("[Barrier] SR after convert:", geoGeom?.spatialReference?.wkid, "| paths:", geoGeom?.paths?.length);
-      if (geoGeom?.paths?.length > 0) {
+      console.log("[Barrier] SR after convert:", geoGeom?.spatialReference?.wkid, "| rings:", geoGeom?.rings?.length);
+      if (geoGeom?.rings?.length > 0) {
         customPolylineBarriers.push(geoGeom);
         console.log("[Barrier] stored. total:", customPolylineBarriers.length);
       } else {

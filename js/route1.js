@@ -205,6 +205,7 @@ require([
           ปลายทาง: toAddress,
           "ระยะทาง (กม.)": segment.distance,
           "ระยะทางสะสม (กม.)": cumulativeDistance.toFixed(2),
+          ถุงยังชีพ: toStop ? (toStop.bags ?? 0) : 0,
         });
       } else {
         resultArray.push({
@@ -213,6 +214,7 @@ require([
           ปลายทาง: toAddress,
           "ระยะทาง (กม.)": "Error",
           "ระยะทางรวมสะสม (กม.)": "Error",
+          ถุงยังชีพ: toStop ? (toStop.bags ?? 0) : 0,
         });
       }
     }

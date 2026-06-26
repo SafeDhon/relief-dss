@@ -57,6 +57,27 @@ function getOrigin() {
   }
 }
 
+function buildVehicleOptions(accessLevel) {
+  const all = [
+    { value: 1, label: "รถบรรทุก" },
+    { value: 2, label: "รถยูนิม็อก" },
+    { value: 3, label: "เรือ" },
+    { value: 4, label: "เฮลิคอปเตอร์" },
+  ];
+  let allowed;
+  if (accessLevel === 1) {
+    allowed = [1, 2];
+  } else if (accessLevel === 3) {
+    allowed = [3, 4];
+  } else {
+    allowed = [1, 2, 3, 4]; // เข้าถึงได้บ้าง หรือไม่มีค่า
+  }
+  return all
+    .filter((v) => allowed.includes(v.value))
+    .map((v) => `<option value="${v.value}">${v.label}</option>`)
+    .join("");
+}
+
 function buildTable(data) {
   console.log(data);
   var table = document.getElementById("myTable");
@@ -100,10 +121,7 @@ function buildTable(data) {
                   
                   <td>
                     <select name="level" class="level-select">
-                      <option value="1">รถบรรทุก</option>
-                      <option value="2">รถยูนิม็อก</option>
-                      <option value="3">เรือ</option>
-                      <option value="4">เฮลิคอปเตอร์</option>
+                      ${buildVehicleOptions(data[i].parameter[4])}
                     </select>
                   </td>
               </tr>`;

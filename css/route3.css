@@ -1,73 +1,139 @@
+/* ===== Expand panel width ===== */
 .esri-expand__content {
-  width: 800px !important;
-  max-width: 800px !important;
+  width: 1000px !important;
+  max-width: 1000px !important;
 }
 
-/* ตารางใน Expand */
+/* ===== Section title bar ===== */
+.route-section-title {
+  font-family: "Noto Sans Thai", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  background-color: #37474f;
+  color: white;
+  padding: 6px 12px;
+  margin: 10px 0 0;
+  border-radius: 4px 4px 0 0;
+  letter-spacing: 0.3px;
+}
+.route-section-title:first-child {
+  margin-top: 4px;
+}
+
+/* ===== Common table styles ===== */
 #routeTableContainer table {
   width: 100%;
   border-collapse: collapse;
   font-family: "Noto Sans Thai", sans-serif;
-  font-size: 15px;
+  font-size: 13px;
   table-layout: fixed;
+  margin-bottom: 4px;
 }
 
-/* กำหนดสไตล์ของเซลล์ */
 #routeTableContainer th,
 #routeTableContainer td {
   border: 1px solid #ddd;
-  padding: 10px 12px;
+  padding: 8px 10px;
   word-wrap: break-word;
 }
 
-/* หัวตารางอยู่กลาง */
 #routeTableContainer th {
   background-color: #005a9e;
   color: white;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13px;
   text-align: center;
 }
 
-/* ทุกแถวพื้นหลังขาว */
-#routeTableContainer tr {
+#routeTableContainer tbody tr {
   background-color: white;
-  color: black;
+  color: #212121;
 }
 
-/* hover แถว */
-#routeTableContainer tr:hover {
+#routeTableContainer tbody tr:nth-child(even) {
+  background-color: #f0f6ff;
+}
+
+#routeTableContainer tbody tr:hover {
   background-color: #0078d7;
   color: white;
 }
 
-/* column 1,4,5 ของ td อยู่ตรงกลาง */
-#routeTableContainer td:nth-child(1),
-#routeTableContainer td:nth-child(4),
-#routeTableContainer td:nth-child(5) {
+/* ===== Vehicle table (5 columns) ===== */
+#vehicleTable th:nth-child(1),
+#vehicleTable td:nth-child(1) {
+  width: 6%;
+  text-align: center;
+}
+#vehicleTable th:nth-child(2),
+#vehicleTable td:nth-child(2) {
+  width: 27%;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#vehicleTable th:nth-child(3),
+#vehicleTable td:nth-child(3) {
+  width: 27%;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#vehicleTable th:nth-child(4),
+#vehicleTable td:nth-child(4) {
+  width: 20%;
+  text-align: center;
+}
+#vehicleTable th:nth-child(5),
+#vehicleTable td:nth-child(5) {
+  width: 20%;
   text-align: center;
 }
 
-/* column 2,3 ของ td ชิดซ้าย */
-#routeTableContainer td:nth-child(2),
-#routeTableContainer td:nth-child(3) {
+/* ===== Boat table (6 columns) ===== */
+#boatTable th:nth-child(1),
+#boatTable td:nth-child(1) {
+  width: 6%;
+  text-align: center;
+}
+#boatTable th:nth-child(2),
+#boatTable td:nth-child(2) {
+  width: 22%;
   text-align: left;
-  white-space: nowrap; /* ห้ามตัดบรรทัด */
-  overflow: hidden; /* ซ่อนข้อความที่เกิน */
+  white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
 }
-
-.esri-widget.esri-component .esri-button {
-  font-family: "Noto Sans Thai", sans-serif; /* ฟอนต์ไทย */
-  font-size: 14px; /* ขนาดตัวอักษร */
-  padding: 10px 12px; /* ความสูงและกว้างของปุ่ม */
-  background-color: #0078d7; /* สีพื้นหลัง */
-  color: white; /* สีตัวอักษร */
-  border: none; /* ลบขอบเดิม */
-  cursor: pointer;
+#boatTable th:nth-child(3),
+#boatTable td:nth-child(3) {
+  width: 22%;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#boatTable th:nth-child(4),
+#boatTable td:nth-child(4) {
+  width: 14%;
+  text-align: center;
+}
+#boatTable th:nth-child(5),
+#boatTable td:nth-child(5) {
+  width: 18%;
+  text-align: center;
+}
+#boatTable th:nth-child(6),
+#boatTable td:nth-child(6) {
+  width: 18%;
+  text-align: center;
 }
 
-/* hover effect */
-.esri-widget.esri-component .esri-button:hover {
-  background-color: #005a9e;
+/* ===== Button styles ===== */
+.esri-widget.esri-component .esri-button {
+  font-family: "Noto Sans Thai", sans-serif;
+  font-size: 14px;
+  padding: 10px 12px;
+  cursor: pointer;
 }

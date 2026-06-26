@@ -302,8 +302,9 @@ require([
       ลำดับ: i + 1,
       ต้นทาง: fromStop.address,
       ปลายทาง: toStop.address,
-      "ระยะทาง (กม.)": (dist / 1000).toFixed(2), // ✅ km, 2 ตำแหน่ง
-      "ระยะทางสะสม (กม.)": (cumulative / 1000).toFixed(2), // ✅ km, 2 ตำแหน่ง
+      "ระยะทาง (กม.)": (dist / 1000).toFixed(2),
+      "ระยะทางสะสม (กม.)": (cumulative / 1000).toFixed(2),
+      ถุงยังชีพ: toStop.bags ?? 0,
     });
   }
 

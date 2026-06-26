@@ -83,62 +83,81 @@ function renderTables(data, refID) {
     if (arrayKeys.length === 0) {
       html += `<p>ไม่มีการจัดส่งด้วยพาหนะชนิดนี้</p>`;
     } else {
+      const orderedHeaders = [
+        "ลำดับ", "ต้นทาง", "ปลายทาง", "ถุงยังชีพ",
+        "ระยะทาง (กม.)", "ระยะทางสะสม (กม.)", "จัดส่ง",
+      ];
+
+      function addRoundNumbers(rows) {
+        const result = rows.map((r) => ({ ...r, row: { ...r.row } }));
+        let i = 0;
+        while (i < result.length) {
+          const key = result[i].row.ต้นทาง + "|" + result[i].row.ปลายทาง;
+          let j = i + 1;
+          while (j < result.length && result[j].row.ต้นทาง + "|" + result[j].row.ปลายทาง === key) j++;
+          if (j - i > 1) {
+            for (let k = i; k < j; k++) {
+              result[k].row.ปลายทาง += ` (รอบที่ ${k - i + 1})`;
+            }
+          }
+          i = j;
+        }
+        return result;
+      }
+
+      function buildTableHTML(rows, docId, key, useCheckbox = true, skipLastRow = true) {
+        return `
+          <table class="delivery-table">
+            <thead><tr>${orderedHeaders.map((h) => `<th>${h}</th>`).join("")}</tr></thead>
+            <tbody>
+              ${rows.map(({ row: o, origIdx }, i) => `
+                <tr>
+                  ${orderedHeaders.map((h) => {
+                    if (h === "จัดส่ง") {
+                      if (!useCheckbox || (skipLastRow && i === rows.length - 1)) return `<td>-</td>`;
+                      return `<td><input type="checkbox"
+                        data-docid="${docId}"
+                        data-field="${key}"
+                        data-index="${origIdx}"
+                        ${o[h] === 1 ? "checked" : ""}></td>`;
+                    }
+                    if (h === "ถุงยังชีพ" && (o[h] === 0 || o[h] == null)) return `<td>-</td>`;
+                    return `<td>${o[h] ?? "-"}</td>`;
+                  }).join("")}
+                </tr>
+              `).join("")}
+            </tbody>
+          </table><br/>`;
+      }
+
       arrayKeys
         .sort((a, b) => Number(a) - Number(b))
         .forEach((key) => {
           const dataObjs = item[key];
-          if (dataObjs.length > 0) {
-            const orderedHeaders = [
-              "ลำดับ",
-              "ต้นทาง",
-              "ปลายทาง",
-              "ระยะทาง (กม.)",
-              "ระยะทางสะสม (กม.)",
-              "จัดส่ง",
-            ];
-
-            html += `
-          <table class="delivery-table" />
-            <thead>
-              <tr>
-                ${orderedHeaders.map((h) => `<th>${h}</th>`).join("")}
-              </tr>
-            </thead>
-            <tbody>
-              ${dataObjs
-                .map(
-                  (o, index) => `
-                <tr>
-                  ${orderedHeaders
-                    .map((h) => {
-                      if (h === "จัดส่ง") {
-                        // ❌ แถวสุดท้ายของแต่ละตาราง จะไม่ให้ติ๊ก
-                        if (index === dataObjs.length - 1) {
-                          return `<td>-</td>`; // หรือจะใส่ข้อความ "สรุป" ก็ได้
-                        }
-
-                        return `<td>
-        <input type="checkbox" 
-          data-docid="${item.id}" 
-          data-field="${key}" 
-          data-index="${index}" 
-          ${o[h] === 1 ? "checked" : ""}>
-      </td>`;
-                      }
-                      return `<td>${o[h] ?? "-"}</td>`;
-                    })
-                    .join("")}
-
-                </tr>
-              `
-                )
-                .join("")}
-            </tbody>
-          </table>
-          <br/>
-        `;
-          } else {
+          if (dataObjs.length === 0) {
             html += `<p>ไม่มีการจัดส่งด้วยพาหนะชนิดนี้</p>`;
+            return;
+          }
+
+          if (item.id === "3") {
+            const group0 = dataObjs
+              .map((o, idx) => ({ row: o, origIdx: idx }))
+              .filter(({ row }) => row.ขนโดย === 0);
+            const group1 = dataObjs
+              .map((o, idx) => ({ row: o, origIdx: idx }))
+              .filter(({ row }) => row.ขนโดย === 1);
+
+            if (group0.length > 0) {
+              html += `<h3>ขนส่งเรือโดย ยูนิม็อก</h3>`;
+              html += buildTableHTML(group0, item.id, key, false);
+            }
+            if (group1.length > 0) {
+              html += `<h3>ขนส่งถุงยังชีพโดย เรือ</h3>`;
+              html += buildTableHTML(addRoundNumbers(group1), item.id, key, true, false);
+            }
+          } else {
+            const rows = dataObjs.map((o, idx) => ({ row: o, origIdx: idx }));
+            html += buildTableHTML(rows, item.id, key);
           }
         });
     }

@@ -30,28 +30,15 @@ async function findDelivery(address, deliveries) {
     for (const key of Object.keys(item)) {
       if (Array.isArray(item[key])) {
         for (const obj of item[key]) {
-          console.log(`${obj["ปลายทาง"]} : ${address}`);
-          if (obj["ปลายทาง"] === address) {
-            return obj["จัดส่ง"] === 1;
-          }
-          if (obj["ปลายทาง"].startsWith(address)) {
-            console.log("match");
-            all = all + 1;
-            console.log(all);
-            if (obj["จัดส่ง"] === 1) {
-              sent = sent + 1;
-            }
-            console.log(sent);
+          if (obj["ปลายทาง"] === address || obj["ปลายทาง"].startsWith(address + " (")) {
+            all++;
+            if (obj["จัดส่ง"] === 1) sent++;
           }
         }
       }
     }
   }
-  if (sent == all) {
-    return true;
-  } else {
-    return false;
-  }
+  return all > 0 && sent === all;
 }
 
 async function fetchRescueData() {

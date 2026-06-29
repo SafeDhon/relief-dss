@@ -48,7 +48,7 @@ function buildTable(data) {
                   <td><input type="number" class="number-input" min="0" autocomplete="new-password"></td>
                   <td>
                     <select name="level" class="level-select">
-                      <option value="1">น้อยกว่า 30%</option>
+                      <option value="1">ไม่เกิน 30%</option>
                       <option value="2">31% - 70%</option>
                       <option value="3">มากกว่า 70%</option>
                     </select>

@@ -90,17 +90,18 @@ function renderTables(data, refID) {
 
       function addRoundNumbers(rows) {
         const result = rows.map((r) => ({ ...r, row: { ...r.row } }));
-        let i = 0;
-        while (i < result.length) {
-          const key = result[i].row.ต้นทาง + "|" + result[i].row.ปลายทาง;
-          let j = i + 1;
-          while (j < result.length && result[j].row.ต้นทาง + "|" + result[j].row.ปลายทาง === key) j++;
-          if (j - i > 1) {
-            for (let k = i; k < j; k++) {
-              result[k].row.ปลายทาง += ` (รอบที่ ${k - i + 1})`;
-            }
+        const count = {};
+        for (const { row } of result) {
+          const key = row.ต้นทาง + "|" + row.ปลายทาง;
+          count[key] = (count[key] || 0) + 1;
+        }
+        const seen = {};
+        for (const { row } of result) {
+          const key = row.ต้นทาง + "|" + row.ปลายทาง;
+          if (count[key] > 1) {
+            seen[key] = (seen[key] || 0) + 1;
+            row.ปลายทาง += ` (รอบที่ ${seen[key]})`;
           }
-          i = j;
         }
         return result;
       }
@@ -114,7 +115,9 @@ function renderTables(data, refID) {
                 <tr>
                   ${orderedHeaders.map((h) => {
                     if (h === "จัดส่ง") {
-                      if (!useCheckbox || (skipLastRow && i === rows.length - 1)) return `<td>-</td>`;
+                      const isReturnLeg = o["ปลายทาง"]?.startsWith("จุดปล่อยเรือ");
+                      const hasNoBags = o["ถุงยังชีพ"] === 0 || o["ถุงยังชีพ"] == null;
+                      if (!useCheckbox || (skipLastRow && i === rows.length - 1) || isReturnLeg || hasNoBags) return `<td>-</td>`;
                       return `<td><input type="checkbox"
                         data-docid="${docId}"
                         data-field="${key}"

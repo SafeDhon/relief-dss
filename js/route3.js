@@ -302,6 +302,8 @@ require([
       expanded: false,
     });
     expand.content.id = "routeTableContainer";
+    expand.content.style.maxHeight = "70vh";
+    expand.content.style.overflowY = "auto";
     view.ui.add(expand, "bottom-left");
   });
 
@@ -627,8 +629,8 @@ let isPlacingBoatLaunch = false;
           isFirstSeg = false;
         }
 
-        const legDist = parseFloat((distFromPrev * 2).toFixed(2));
-        totalBoatDist = parseFloat((totalBoatDist + legDist).toFixed(2));
+        const outDist = parseFloat(distFromPrev.toFixed(2));
+        totalBoatDist = parseFloat((totalBoatDist + outDist).toFixed(2));
 
         cumulativeRouteArray.push({
           รอบ: ri + 1,
@@ -636,7 +638,7 @@ let isPlacingBoatLaunch = false;
           ต้นทาง: prevName,
           ปลายทาง: stop.address,
           "ถุงยังชีพที่ขน": task.bags,
-          "ระยะทาง (กม.)": legDist,
+          "ระยะทาง (กม.)": outDist,
           "ระยะทางสะสม (กม.)": totalBoatDist,
         });
 
@@ -670,8 +672,23 @@ let isPlacingBoatLaunch = false;
         globalOrder++;
       }
 
-      // วาดเส้นขากลับ (เส้นประ)
+      // เพิ่ม row ขากลับ + วาดเส้นประ
       if (lastStop) {
+        const retDist = bestRoute[lastStop.id]?.distance ?? null;
+        if (retDist !== null) {
+          totalBoatDist = parseFloat((totalBoatDist + retDist).toFixed(2));
+        }
+        cumulativeRouteArray.push({
+          รอบ: ri + 1,
+          ลำดับ: globalOrder,
+          ต้นทาง: prevName,
+          ปลายทาง: `จุดปล่อยเรือ ${launchNum}`,
+          "ถุงยังชีพที่ขน": 0,
+          "ระยะทาง (กม.)": retDist !== null ? parseFloat(retDist.toFixed(2)) : "-",
+          "ระยะทางสะสม (กม.)": retDist !== null ? totalBoatDist : "-",
+        });
+        globalOrder++;
+
         const retGeom = bestRoute[lastStop.id]?.geometry;
         if (retGeom) {
           routesLayer.add(
@@ -714,7 +731,7 @@ let isPlacingBoatLaunch = false;
         "<th>ถุงยังชีพที่ขน</th><th>ระยะทาง เรือ (กม.)</th><th>ระยะทางสะสม เรือ (กม.)</th>" +
         "</tr></thead><tbody>";
       cumulativeRouteArray.forEach((row) => {
-        html += `<tr><td>${row.ลำดับ}</td><td>${row.ต้นทาง}</td><td>${row.ปลายทาง}</td><td>${row["ถุงยังชีพที่ขน"]}</td><td>${row["ระยะทาง (กม.)"]}</td><td>${row["ระยะทางสะสม (กม.)"]}</td></tr>`;
+        html += `<tr><td>${row.ลำดับ}</td><td>${row.ต้นทาง}</td><td>${row.ปลายทาง}</td><td>${row["ถุงยังชีพที่ขน"] || "-"}</td><td>${row["ระยะทาง (กม.)"]}</td><td>${row["ระยะทางสะสม (กม.)"]}</td></tr>`;
       });
       html += "</tbody></table>";
     }

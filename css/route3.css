@@ -2,6 +2,8 @@
 .esri-expand__content {
   width: 1000px !important;
   max-width: 1000px !important;
+  max-height: 70vh !important;
+  overflow-y: auto !important;
 }
 
 /* ===== Section title bar ===== */

@@ -151,3 +151,8 @@ const historyBtn = document.getElementById("historyBtn");
 historyBtn.addEventListener("click", () => {
   window.location.href = "../pages/history.html";
 });
+
+const communityBtn = document.getElementById("communityBtn");
+communityBtn.addEventListener("click", () => {
+  window.location.href = "../pages/community.html";
+});

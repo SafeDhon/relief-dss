@@ -186,10 +186,15 @@ body {
 }
 .table td:nth-child(1),
 .table td:nth-child(3),
+.table td:nth-child(5),
 .table td:nth-child(6),
-.table td:nth-child(5) {
-  text-align: center; /* จัดข้อความตรงกลางแนวนอน */
-  /* vertical-align: middle; จัดข้อความตรงกลางแนวตั้ง (ถ้าสูงกว่าปกติ) */
+.table td:nth-child(7) {
+  text-align: center;
+}
+
+.no-vehicle {
+  display: block;
+  text-align: center;
 }
 .table-head th {
   padding-top: 8px;

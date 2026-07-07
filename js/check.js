@@ -249,9 +249,9 @@ document.getElementById("conclu-button").addEventListener("click", async () => {
 });
 
 
-const historyBtn = document.getElementById("historyBtn");
-historyBtn.addEventListener("click", () => {
-  window.location.href = "../pages/history.html";
+const backBtn = document.getElementById("backBtn");
+backBtn.addEventListener("click", () => {
+  window.location.href = "home.html";
 });
 
 fetchRescueData();

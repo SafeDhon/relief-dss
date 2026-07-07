@@ -239,10 +239,9 @@ function updateIdsWithIndex(data) {
   });
 }
 
-// ปุ่มไปหน้า History
-const historyBtn = document.getElementById("historyBtn");
-historyBtn.addEventListener("click", () => {
-  window.location.href = "../pages/history.html";
+const backBtn = document.getElementById("backBtn");
+backBtn.addEventListener("click", () => {
+  window.location.href = "home.html";
 });
 
 // var testData = [

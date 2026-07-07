@@ -35,6 +35,11 @@ body {
   font-family: "Noto Sans Thai", sans-serif;
 }
 
+.appbar-right {
+  display: flex;
+  gap: 8px;
+}
+
 .appbar-btn {
   background-color: transparent;
   border: 1px solid white;

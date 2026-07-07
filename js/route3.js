@@ -765,19 +765,6 @@ let isPlacingBoatLaunch = false;
     renderExpandTable();
   }
 
-  document.getElementById("setBoatLaunchPoint").addEventListener("click", () => {
-    isPlacingBoatLaunch = !isPlacingBoatLaunch;
-    const btn = document.getElementById("setBoatLaunchPoint");
-    if (isPlacingBoatLaunch) {
-      btn.textContent = "กำลังเลือกจุด... (คลิกเพื่อยกเลิก)";
-      btn.style.backgroundColor = "#0088bb";
-      view.container.style.cursor = "crosshair";
-    } else {
-      btn.textContent = "กำหนดจุดปล่อยเรือ";
-      btn.style.backgroundColor = "#00b0f0";
-      view.container.style.cursor = "default";
-    }
-  });
 
   function takeSnapshot() {
     return {
@@ -795,32 +782,6 @@ let isPlacingBoatLaunch = false;
     };
   }
 
-  document.getElementById("undoBoatLaunch").addEventListener("click", () => {
-    if (launchPointHistory.length === 0) return;
-    const snap = launchPointHistory.pop();
-
-    boatLaunchLayer.removeAll();
-    snap.boatLaunchGraphics.forEach((g) => boatLaunchLayer.add(g));
-
-    boatLaunchLineLayer.removeAll();
-    snap.boatLaunchLineGraphics.forEach((g) => boatLaunchLineLayer.add(g));
-
-    routesLayer.removeAll();
-    snap.routesGraphics.forEach((g) => routesLayer.add(g));
-
-    stopsLayer.removeAll();
-    snap.stopsGraphics.forEach((g) => stopsLayer.add(g));
-
-    cumulativeRouteArray = snap.cumulativeRouteArray;
-    vehicleRouteArray = snap.vehicleRouteArray;
-    handledStopIds = snap.handledStopIds;
-    totalBoatDist = snap.totalBoatDist;
-    boatLaunchCount = snap.boatLaunchCount;
-    lastBoatLaunchPoint = snap.lastBoatLaunchPoint;
-    boatLaunchPoint = snap.boatLaunchPoint;
-
-    renderExpandTable();
-  });
 
   view.on("click", async (event) => {
     const placingFirst = isPlacingBoatLaunch;
@@ -834,8 +795,6 @@ let isPlacingBoatLaunch = false;
     isPlacingBoatLaunch = false;
     isPlacingAddBoatLaunch = false;
     view.container.style.cursor = "default";
-    document.getElementById("setBoatLaunchPoint").textContent = "กำหนดจุดปล่อยเรือ";
-    document.getElementById("setBoatLaunchPoint").style.backgroundColor = "#00b0f0";
     document.getElementById("addBoatLaunchPoint").textContent = "เพิ่มจุดปล่อยเรือ";
     document.getElementById("addBoatLaunchPoint").style.backgroundColor = "#00b0f0";
 
@@ -1026,3 +985,4 @@ let isPlacingBoatLaunch = false;
     }
   });
 });
+

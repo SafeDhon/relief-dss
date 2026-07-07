@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>จัดการชุมชน</title>
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/community.css" />
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.29/esri/themes/light/main.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="appbar">
+      <div class="appbar-left">
+        <img
+          src="https://safedhon.github.io/relief-dss/images/logo.png"
+          alt="โลโก้"
+          class="appbar-logo"
+        />
+        <span class="appbar-title"
+          >ระบบสนับสนุนการตัดสินใจในการจัดสรรทรัพยากรบรรเทาสาธารณภัยของกองทัพอากาศ</span
+        >
+      </div>
+      <button class="appbar-btn" id="backBtn">กลับหน้าแรก</button>
+    </header>
+    <div class="container">
+      <h2>..... จัดการชุมชน .....</h2>
+      <div class="search-controls">
+        <select id="searchOptions">
+          <option value="" disabled selected>เลือกกองบิน</option>
+          <option value="100">โรงเรียนการบิน</option>
+          <option value="1">กองบิน 1</option>
+          <option value="2">กองบิน 2</option>
+          <option value="3">กองบิน 3</option>
+          <option value="4">กองบิน 4</option>
+          <option value="5">กองบิน 5</option>
+          <option value="6">กองบิน 6</option>
+          <option value="7">กองบิน 7</option>
+          <option value="21">กองบิน 21</option>
+          <option value="23">กองบิน 23</option>
+          <option value="41">กองบิน 41</option>
+          <option value="46">กองบิน 46</option>
+          <option value="56">กองบิน 56</option>
+        </select>
+        <button class="add-community-btn" id="addCommunityBtn">+ เพิ่มชุมชน</button>
+      </div>
+      <ul id="listContainer">
+        <li id="placeholder" style="color: #888">กรุณาเลือกกองบิน</li>
+      </ul>
+      <div class="flex-container">
+        <button class="green-button" id="nextBtn">ต่อไป</button>
+      </div>
+    </div>
+
+    <!-- Modal เพิ่มชุมชน -->
+    <div id="addCommunityModal" class="modal-overlay">
+      <div class="modal-box">
+        <h3 class="modal-title">เพิ่มชุมชน</h3>
+        <input
+          type="text"
+          id="newCommunityName"
+          class="community-name-input"
+          placeholder="กรอกชื่อชุมชน..."
+        />
+        <p id="coordDisplay" class="coord-display">
+          ค้นหาหรือคลิกบนแผนที่เพื่อเลือกตำแหน่ง
+        </p>
+        <div id="mapModalDiv"></div>
+        <div class="modal-actions">
+          <button id="cancelAddBtn" class="cancel-btn">ยกเลิก</button>
+          <button id="saveAddBtn" class="green-button">บันทึก</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://js.arcgis.com/4.29/"></script>
+    <script type="module" src="../js/community.js"></script>
+  </body>
+</html>

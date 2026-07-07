@@ -57,25 +57,14 @@ function getOrigin() {
   }
 }
 
-function buildVehicleOptions(accessLevel) {
-  const all = [
-    { value: 1, label: "รถบรรทุก" },
-    { value: 2, label: "รถยูนิม็อก" },
-    { value: 3, label: "เรือ" },
-    { value: 4, label: "เฮลิคอปเตอร์" },
-  ];
-  let allowed;
-  if (accessLevel === 1) {
-    allowed = [1, 2];
-  } else if (accessLevel === 3) {
-    allowed = [3, 4];
-  } else {
-    allowed = [1, 2, 3, 4]; // เข้าถึงได้บ้าง หรือไม่มีค่า
+function buildVehicleCell(accessLevel) {
+  if (accessLevel === 3) {
+    return `<select name="level" class="level-select">
+      <option value="3">เรือ</option>
+      <option value="4">ฮอลิคอปเตอร์</option>
+    </select>`;
   }
-  return all
-    .filter((v) => allowed.includes(v.value))
-    .map((v) => `<option value="${v.value}">${v.label}</option>`)
-    .join("");
+  return `<span class="no-vehicle">-</span>`;
 }
 
 function buildTable(data) {
@@ -119,11 +108,7 @@ function buildTable(data) {
                 <td>${param1}</td>
                 <td>${param2}</td>
                   
-                  <td>
-                    <select name="level" class="level-select">
-                      ${buildVehicleOptions(data[i].parameter[4])}
-                    </select>
-                  </td>
+                  <td>${buildVehicleCell(data[i].parameter[4])}</td>
               </tr>`;
     table.innerHTML += row;
   }
@@ -140,13 +125,10 @@ function getTableData() {
     const survivalBagInput = row.querySelector(".number-input");
     const vehicleSelect = row.querySelector(".level-select");
 
-    if (survivalBagInput && vehicleSelect) {
-      const survivalBag = parseInt(survivalBagInput.value);
-      const vehicle = parseInt(vehicleSelect.value);
-
+    if (survivalBagInput) {
       result.push({
-        survivalBag: survivalBag,
-        vehicle: vehicle,
+        survivalBag: parseInt(survivalBagInput.value),
+        vehicle: vehicleSelect ? parseInt(vehicleSelect.value) : null,
       });
     }
   });
@@ -166,6 +148,66 @@ butt.addEventListener("click", async function () {
     }
   } else {
     console.warn("จำนวนสมาชิกใน _data และ _bagVehicle ไม่เท่ากัน");
+  }
+
+  // ── Rule 1: null vehicle → ยูนิม็อก ────────────────────────────────────────
+  for (let i = 0; i < _data.length; i++) {
+    if (_data[i].vehicle === null) {
+      _data[i].vehicle = 2;
+    }
+  }
+
+  // ── Rule 2: รอบสุดท้ายของยูนิม็อก < 250 ถุง → ลองเปลี่ยนเป็นรถบรรทุก ──────
+  const UNIMOG_CAPACITY = 400;
+  const TRUCK_THRESHOLD = 250;
+
+  const unimogIndices = _data
+    .map((c, i) => (c.vehicle === 2 ? i : -1))
+    .filter((i) => i >= 0);
+
+  if (unimogIndices.length > 0) {
+    // แตกแต่ละชุมชนที่เกิน capacity เป็น parts พร้อมเก็บ index
+    const allParts = [];
+    unimogIndices.forEach((idx) => {
+      const c = _data[idx];
+      let remaining = c.survivalBag;
+      while (remaining > 0) {
+        const take = Math.min(remaining, UNIMOG_CAPACITY);
+        allParts.push({
+          _idx: idx,
+          _take: take,
+          _accessLevel: c.parameter[4],
+        });
+        remaining -= take;
+      }
+    });
+
+    // จัดกลุ่มตาม capacity
+    const groups = [];
+    let curGroup = [];
+    let curSum = 0;
+    allParts.forEach((p) => {
+      if (curSum + p._take > UNIMOG_CAPACITY) {
+        groups.push(curGroup);
+        curGroup = [];
+        curSum = 0;
+      }
+      curGroup.push(p);
+      curSum += p._take;
+    });
+    if (curGroup.length > 0) groups.push(curGroup);
+
+    const lastGroup = groups[groups.length - 1];
+    const lastGroupTotal = lastGroup.reduce((sum, p) => sum + p._take, 0);
+
+    if (lastGroupTotal < TRUCK_THRESHOLD) {
+      const hasModerateAccess = lastGroup.some((p) => p._accessLevel === 2);
+      if (!hasModerateAccess) {
+        lastGroup.forEach((p) => {
+          _data[p._idx].vehicle = 1;
+        });
+      }
+    }
   }
 
   var _originWing = getOrigin();
@@ -201,8 +243,7 @@ butt.addEventListener("click", async function () {
   }
 });
 
-// ปุ่มไปหน้า History
-const historyBtn = document.getElementById("historyBtn");
-historyBtn.addEventListener("click", () => {
-  window.location.href = "../pages/history.html";
+const backBtn = document.getElementById("backBtn");
+backBtn.addEventListener("click", () => {
+  window.location.href = "home.html";
 });

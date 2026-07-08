@@ -12,6 +12,7 @@ require([
   "esri/layers/GraphicsLayer",
   "esri/widgets/Expand",
   "esri/geometry/support/webMercatorUtils",
+  "esri/geometry/geometryEngine",
 ], function (
   esriConfig,
   Extent,
@@ -25,7 +26,8 @@ require([
   SketchViewModel,
   GraphicsLayer,
   Expand,
-  webMercatorUtils
+  webMercatorUtils,
+  geometryEngine
 ) {
   // const apiKey =
   // "AAPTxy8BH1VEsoebNVZXo8HurBEwtQ3TZNnChgqbR-VNfayPQ2LL2HzAyWwmz4JkMpHlO8ny01mMiOXu9L4R_5BchZcNTEqcvmJnhFE5OjLaMs0DK0he1Eeil0PyCiqaII0Da7tFc7KKxexFyOzk-ShAp9NzcEJfnylkw0NGQHDAm3prSxAVrG6R_5BchZcNTEqcvmJnhFE5OjLaMs0DK0he1Eeil0PyCiqaII0Da7tFc7KKxexFyOzk-ShAp9NzcEJfnylkw0NGQHDAm3prSxAVrG6RAtu3utx_F8tuzuy74-1yu7UtCF7K6l5AlYIZi3N7XRAA55U9DUzQaLhNsfcE8PGnRW3l64PM0qYgAT1_b6Losegl"; // *** อย่าลืมเปลี่ยนเป็น ArcGIS API Key ของคุณ! ***
@@ -149,7 +151,6 @@ require([
     basemap: "arcgis-navigation",
   });
 
-  const customPolylineBarriers = [];
   const drawnPolylineBarrierLayer = new GraphicsLayer();
   const stopsLayer = new GraphicsLayer();
   const routesLayer = new GraphicsLayer();
@@ -182,6 +183,15 @@ require([
 
   view.ui.add(titleInfo, "top-left");
 
+  // ดึง geometry ของสิ่งกีดขวางทั้งหมดสดจาก drawnPolylineBarrierLayer เสมอ (ไม่ cache แยก)
+  // เพื่อไม่ให้เกิดปัญหา array ไม่ sync กับ layer ตอนลบ/เพิ่ม polygon
+  function getBarrierGeometries() {
+    return drawnPolylineBarrierLayer.graphics
+      .toArray()
+      .map((g) => webMercatorUtils.webMercatorToGeographic(g.geometry))
+      .filter((g) => g?.rings?.length > 0);
+  }
+
   // ฟังก์ชันสำหรับคำนวณเส้นทางระหว่างจุด 2 จุด
   async function solveRoute(startPoint, endPoint, useBarriers = true) {
     const stops = [
@@ -202,7 +212,7 @@ require([
     ];
 
     const barrierFeatures = useBarriers
-      ? customPolylineBarriers.map((geom) => new Graphic({ geometry: geom, attributes: { Barrier_Type: 0 } }))
+      ? getBarrierGeometries().map((geom) => new Graphic({ geometry: geom, attributes: { Barrier_Type: 0 } }))
       : [];
 
     console.log(`[solveRoute] from=${startPoint.address ?? startPoint.id} to=${endPoint.address ?? endPoint.id} | useBarriers=${useBarriers} | barriers=${barrierFeatures.length}`);
@@ -313,14 +323,22 @@ require([
   view.ui.add(document.getElementById("buttonDiv7"), "top-trailing");
 view.ui.add(document.getElementById("buttonDiv1"), "bottom-trailing");
 
+  const barrierDefaultSymbol = {
+    type: "simple-fill",
+    color: [255, 0, 0, 0.3],
+    outline: { color: [255, 0, 0, 0.9], width: 2 },
+  };
+  const barrierSelectedSymbol = {
+    type: "simple-fill",
+    color: [255, 0, 0, 0.45],
+    outline: { color: [255, 255, 0, 1], width: 3 },
+  };
+  let selectedBarrierGraphic = null;
+
   const sketchVM = new SketchViewModel({
     view: view,
     layer: drawnPolylineBarrierLayer,
-    polygonSymbol: {
-      type: "simple-fill",
-      color: [255, 0, 0, 0.3],
-      outline: { color: [255, 0, 0, 0.9], width: 2 },
-    },
+    polygonSymbol: barrierDefaultSymbol,
   });
 
   document
@@ -331,17 +349,44 @@ view.ui.add(document.getElementById("buttonDiv1"), "bottom-trailing");
 
   sketchVM.on("create", (event) => {
     if (event.state === "complete") {
-      const geom = event.graphic.geometry;
-      // แปลงจาก Web Mercator (102100) → WGS84 (4326) ให้ตรงกับ SR ของ stops ที่ส่งให้ route service
-      const geoGeom = webMercatorUtils.webMercatorToGeographic(geom);
-      console.log("[Barrier] SR after convert:", geoGeom?.spatialReference?.wkid, "| rings:", geoGeom?.rings?.length);
-      if (geoGeom?.rings?.length > 0) {
-        customPolylineBarriers.push(geoGeom);
-        console.log("[Barrier] stored. total:", customPolylineBarriers.length);
-      } else {
-        console.warn("[Barrier] geometry ว่าง ไม่ได้เก็บ");
-      }
+      console.log("[Barrier] วาดเสร็จ. รวมสิ่งกีดขวางทั้งหมดตอนนี้:", getBarrierGeometries().length);
     }
+  });
+
+  function deselectBarrierGraphic() {
+    if (!selectedBarrierGraphic) return;
+    selectedBarrierGraphic.symbol = barrierDefaultSymbol;
+    selectedBarrierGraphic = null;
+  }
+
+  function selectBarrierGraphic(graphic) {
+    if (selectedBarrierGraphic === graphic) return;
+    deselectBarrierGraphic();
+    selectedBarrierGraphic = graphic;
+    graphic.symbol = barrierSelectedSymbol;
+  }
+
+  // คลิกที่ polygon สิ่งกีดขวางเพื่อเลือก (ไฮไลต์เหลือง) แล้วกดปุ่ม Delete บนคีย์บอร์ดเพื่อลบ
+  view.on("click", async (event) => {
+    if (isPlacingBoatLaunch || isPlacingAddBoatLaunch || sketchVM.state === "active") return;
+
+    const hit = await view.hitTest(event, { include: drawnPolylineBarrierLayer });
+    const result = hit.results.find((r) => r.graphic && r.graphic.layer === drawnPolylineBarrierLayer);
+
+    if (result) {
+      selectBarrierGraphic(result.graphic);
+    } else {
+      deselectBarrierGraphic();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Delete" || !selectedBarrierGraphic) return;
+
+    console.log("[Barrier][Delete] ก่อนลบ:", getBarrierGeometries().length, "รูป");
+    drawnPolylineBarrierLayer.remove(selectedBarrierGraphic);
+    selectedBarrierGraphic = null;
+    console.log("[Barrier][Delete] หลังลบ:", getBarrierGeometries().length, "รูป");
   });
 
 let isPlacingBoatLaunch = false;
@@ -421,7 +466,9 @@ let isPlacingBoatLaunch = false;
             title: stop.address,
             content:
               `<b>ผู้ประสบภัย:</b> ${stop.victim} ราย<br><b>ถุงยังชีพ:</b> ${stop.bags} ถุง` +
-              (isOver ? `<br><b style="color:#d32f2f">ห่างเกิน 5 กม. — ให้เลือกจุดปล่อยเรือจุดต่อไป</b>` : ""),
+              (isOver
+                ? `<br><b style="color:#d32f2f">ห่างเกิน 5 กม. — ให้เลือกจุดปล่อยเรือจุดต่อไป</b>`
+                : `<br><b>จัดส่งจากจุดปล่อยเรือ:</b> ${launchNum}`),
           },
         })
       );
@@ -436,8 +483,11 @@ let isPlacingBoatLaunch = false;
 
     if (okStops.length === 0) return;
 
-    // บันทึกชุมชนที่จะถูกจัดการในรอบนี้เข้า handledStopIds ทันที
-    okStops.forEach((s) => handledStopIds.add(s.id));
+    // บันทึกชุมชนที่จะถูกจัดการในรอบนี้เข้า handledStopIds ทันที พร้อมเก็บว่าจัดส่งจากจุดปล่อยเรือหมายเลขใด
+    okStops.forEach((s) => {
+      handledStopIds.add(s.id);
+      s.launchPoint = launchNum;
+    });
 
     // Step 3: ระยะทางระหว่างชุมชน okStops ทุกคู่ (ทั้งสองทิศทาง)
     const stopToStop = {};
@@ -782,21 +832,110 @@ let isPlacingBoatLaunch = false;
     };
   }
 
+  // ===== Dialog เลือกชุมชนที่จุดปล่อยเรือนี้จะไปส่ง =====
+  let communityModalOverlay = null;
+  let communityModalListEl = null;
+  let communityModalResolve = null;
+
+  function ensureCommunityModal() {
+    if (communityModalOverlay) return;
+
+    communityModalOverlay = document.createElement("div");
+    communityModalOverlay.className = "boatModalOverlay";
+
+    const box = document.createElement("div");
+    box.className = "boatModalBox";
+
+    const title = document.createElement("h3");
+    title.className = "boatModalTitle";
+    title.textContent = "เลือกชุมชนที่จุดปล่อยเรือนี้จะไปส่ง";
+
+    communityModalListEl = document.createElement("div");
+    communityModalListEl.className = "boatModalList";
+
+    const actions = document.createElement("div");
+    actions.className = "boatModalActions";
+
+    const cancelBtn = document.createElement("button");
+    cancelBtn.type = "button";
+    cancelBtn.className = "boatModalCancelBtn";
+    cancelBtn.textContent = "ยกเลิก";
+    cancelBtn.addEventListener("click", () => {
+      communityModalOverlay.classList.remove("active");
+      if (communityModalResolve) communityModalResolve(null);
+    });
+
+    const confirmBtn = document.createElement("button");
+    confirmBtn.type = "button";
+    confirmBtn.className = "boatModalConfirmBtn";
+    confirmBtn.textContent = "ยืนยัน";
+    confirmBtn.addEventListener("click", () => {
+      const checked = communityModalListEl.querySelectorAll("input[type='checkbox']:checked:not(:disabled)");
+      if (checked.length === 0) {
+        alert("กรุณาเลือกอย่างน้อย 1 ชุมชน");
+        return;
+      }
+      const selectedIds = Array.from(checked).map((cb) => Number(cb.value));
+      communityModalOverlay.classList.remove("active");
+      if (communityModalResolve) communityModalResolve(selectedIds);
+    });
+
+    actions.append(cancelBtn, confirmBtn);
+    box.append(title, communityModalListEl, actions);
+    communityModalOverlay.appendChild(box);
+    document.body.appendChild(communityModalOverlay);
+  }
+
+  // แสดง dialog รายชื่อชุมชนทั้งหมดพร้อมลำดับและ checkbox ให้เลือกว่าจุดปล่อยเรือนี้จะไปส่งชุมชนใดบ้าง
+  // ชุมชนที่ถูกจัดส่งไปแล้ว (handledIds) จะขึ้นติ๊กไว้แต่เป็นสีเทากดไม่ได้ ส่วนที่เหลือ default ไม่ติ๊ก
+  // คืนค่า array ของชุมชนที่เลือกใหม่ หรือ null ถ้ากดยกเลิก
+  function askCommunitySelection(allCommunities, handledIds) {
+    ensureCommunityModal();
+    communityModalListEl.innerHTML = "";
+
+    allCommunities.forEach((stop) => {
+      const isHandled = handledIds.has(stop.id);
+
+      const row = document.createElement("label");
+      row.className = "boatModalItem" + (isHandled ? " boatModalItemDisabled" : "");
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.value = String(stop.id);
+      checkbox.checked = isHandled;
+      checkbox.disabled = isHandled;
+
+      const text = document.createElement("span");
+      text.textContent = `${stop.id - 1}. ${stop.address}` + (isHandled && stop.launchPoint ? ` (จุดปล่อยเรือ ${stop.launchPoint})` : "");
+
+      row.append(checkbox, text);
+      communityModalListEl.appendChild(row);
+    });
+
+    communityModalOverlay.classList.add("active");
+
+    return new Promise((resolve) => {
+      communityModalResolve = (selectedIds) => {
+        resolve(selectedIds ? allCommunities.filter((s) => selectedIds.includes(s.id)) : null);
+      };
+    });
+  }
 
   view.on("click", async (event) => {
     const placingFirst = isPlacingBoatLaunch;
     const placingAdd = isPlacingAddBoatLaunch;
     if (!placingFirst && !placingAdd) return;
 
-    // บันทึก snapshot ก่อนทำการเปลี่ยนแปลงใด ๆ
-    launchPointHistory.push(takeSnapshot());
-
-    // ออกจากโหมดทันที
-    isPlacingBoatLaunch = false;
-    isPlacingAddBoatLaunch = false;
-    view.container.style.cursor = "default";
-    document.getElementById("addBoatLaunchPoint").textContent = "เพิ่มจุดปล่อยเรือ";
-    document.getElementById("addBoatLaunchPoint").style.backgroundColor = "#00b0f0";
+    // เช็คซ้ำ ณ ตอนวางจุดจริง เผื่อสิ่งกีดขวางถูกลบ/แก้ไขไปหลังจากกดปุ่มแล้ว
+    if (!allCommunitiesCoveredByBarriers()) {
+      alert("กรุณาวาดสิ่งกีดขวางให้ครอบคลุมทุกชุมชน");
+      isPlacingBoatLaunch = false;
+      isPlacingAddBoatLaunch = false;
+      view.container.style.cursor = "default";
+      document.getElementById("addBoatLaunchPoint").textContent = "เพิ่มจุดปล่อยเรือ";
+      document.getElementById("addBoatLaunchPoint").style.backgroundColor = "#00b0f0";
+      return;
+    }
 
     const newPoint = {
       id: "boat",
@@ -804,6 +943,35 @@ let isPlacingBoatLaunch = false;
       lat: event.mapPoint.latitude,
       long: event.mapPoint.longitude,
     };
+
+    // ให้ผู้ใช้เลือกว่าจุดปล่อยเรือนี้จะไปส่งชุมชนใดบ้าง — แสดงทุกชุมชน
+    // ชุมชนที่จุดก่อนหน้าจัดส่งไปแล้วจะขึ้นติ๊กไว้แต่กดไม่ได้ (handledStopIds)
+    const allCommunities = stopData.filter((s) => s.id !== 1);
+    const hasRemaining = allCommunities.some((s) => !handledStopIds.has(s.id));
+
+    if (!hasRemaining) {
+      alert("ทุกชุมชนถูกจัดส่งครบแล้ว ไม่มีชุมชนให้เลือกเพิ่ม");
+      isPlacingBoatLaunch = false;
+      isPlacingAddBoatLaunch = false;
+      view.container.style.cursor = "default";
+      document.getElementById("addBoatLaunchPoint").textContent = "เพิ่มจุดปล่อยเรือ";
+      document.getElementById("addBoatLaunchPoint").style.backgroundColor = "#00b0f0";
+      return;
+    }
+
+    const selectedCommunities = await askCommunitySelection(allCommunities, handledStopIds);
+
+    // ออกจากโหมดวางจุดเสมอ ไม่ว่าจะกดยืนยันหรือยกเลิก
+    isPlacingBoatLaunch = false;
+    isPlacingAddBoatLaunch = false;
+    view.container.style.cursor = "default";
+    document.getElementById("addBoatLaunchPoint").textContent = "เพิ่มจุดปล่อยเรือ";
+    document.getElementById("addBoatLaunchPoint").style.backgroundColor = "#00b0f0";
+
+    if (!selectedCommunities) return; // กดยกเลิก — ไม่วางจุดปล่อยเรือ
+
+    // บันทึก snapshot ก่อนทำการเปลี่ยนแปลงใด ๆ
+    launchPointHistory.push(takeSnapshot());
 
     if (placingFirst) {
       // รีเซ็ตสถานะทั้งหมด
@@ -847,8 +1015,7 @@ let isPlacingBoatLaunch = false;
       });
       renderExpandTable();
 
-      const allCommunities = stopData.filter((s) => s.id !== 1);
-      await calculateBoatRoutes(newPoint, allCommunities, false, boatLaunchCount);
+      await calculateBoatRoutes(newPoint, selectedCommunities, false, boatLaunchCount);
       await drawReturnToBaseIfComplete();
 
     } else {
@@ -886,13 +1053,45 @@ let isPlacingBoatLaunch = false;
 
       lastBoatLaunchPoint = newPoint;
 
-      const remaining = stopData.filter((s) => s.id !== 1 && !handledStopIds.has(s.id));
-      await calculateBoatRoutes(newPoint, remaining, true, boatLaunchCount);
+      await calculateBoatRoutes(newPoint, selectedCommunities, true, boatLaunchCount);
       await drawReturnToBaseIfComplete();
     }
   });
 
+  // ตรวจว่าชุมชนทุกจุด (ยกเว้นฐาน) อยู่ในพื้นที่สีแดงของ polygon สิ่งกีดขวางอย่างน้อยหนึ่งรูป
+  function allCommunitiesCoveredByBarriers() {
+    const communities = stopData.filter((s) => s.id !== 1);
+    const barrierGeoms = getBarrierGeometries();
+    console.log(`[Coverage] ตรวจสอบ — สิ่งกีดขวางปัจจุบันมี ${barrierGeoms.length} รูป, ชุมชนทั้งหมด ${communities.length} จุด`);
+
+    if (communities.length === 0 || barrierGeoms.length === 0) {
+      console.log("[Coverage] ผลลัพธ์: ไม่ครอบคลุม (ไม่มีชุมชนหรือไม่มีสิ่งกีดขวาง)");
+      return false;
+    }
+
+    const result = communities.every((c) => {
+      const pt = new Point({ longitude: c.long, latitude: c.lat, spatialReference: { wkid: 4326 } });
+      const covered = barrierGeoms.some((poly) => {
+        try {
+          return geometryEngine.contains(poly, pt);
+        } catch (e) {
+          return false;
+        }
+      });
+      console.log(`[Coverage] ชุมชน "${c.address}" (id=${c.id}) ${covered ? "อยู่ในพื้นที่สิ่งกีดขวาง" : "ไม่อยู่ในพื้นที่สิ่งกีดขวาง"}`);
+      return covered;
+    });
+
+    console.log(`[Coverage] ผลลัพธ์รวม: ${result ? "ครอบคลุมทุกชุมชน" : "ไม่ครอบคลุมทุกชุมชน"}`);
+    return result;
+  }
+
   document.getElementById("addBoatLaunchPoint").addEventListener("click", () => {
+    if (!isPlacingAddBoatLaunch && !allCommunitiesCoveredByBarriers()) {
+      alert("กรุณาวาดสิ่งกีดขวางให้ครอบคลุมทุกชุมชน");
+      return;
+    }
+
     isPlacingAddBoatLaunch = !isPlacingAddBoatLaunch;
     const btn = document.getElementById("addBoatLaunchPoint");
     if (isPlacingAddBoatLaunch) {

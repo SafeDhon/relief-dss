@@ -285,8 +285,12 @@ require([
   // ---------- สร้าง array ลำดับเส้นทาง (ใช้ address + km) ----------
   const routeIds = minRoute.route.split(" → ").map(Number);
 
+  const vehicleSpeed = { 1: 100, 2: 80, 3: 60, 4: 150 }[Number(v)] ?? 80;
+  const unloadMin = { 1: 10, 2: 15, 3: 5, 4: 10 }[Number(v)] ?? 10;
+
   const routeSteps = [];
   let cumulative = 0;
+  let cumulativeTimeMin = 0;
 
   for (let i = 0; i < routeIds.length - 1; i++) {
     const fromId = routeIds[i];
@@ -297,14 +301,21 @@ require([
 
     const dist = distanceBetween(fromId, toId); // เมตร
     cumulative += dist;
+    const distKm = dist / 1000;
+    const travelMin = (distKm / vehicleSpeed) * 60;
+    const isReturn = toId === 1;
+    const segMin = travelMin + (isReturn ? 0 : unloadMin);
+    cumulativeTimeMin += segMin;
 
     routeSteps.push({
       ลำดับ: i + 1,
       ต้นทาง: fromStop.address,
       ปลายทาง: toStop.address,
-      "ระยะทาง (กม.)": (dist / 1000).toFixed(2),
+      "ระยะทาง (กม.)": distKm.toFixed(2),
       "ระยะทางสะสม (กม.)": (cumulative / 1000).toFixed(2),
       ถุงยังชีพ: toStop.bags ?? 0,
+      "เวลาเดินทาง (ชม:นาที)": formatTime(segMin),
+      "เวลาสะสม (ชม:นาที)": formatTime(cumulativeTimeMin),
     });
   }
 
@@ -380,13 +391,20 @@ require([
     }
   });
 
+  function formatTime(minutes) {
+    const h = Math.floor(minutes / 60);
+    const m = Math.round(minutes % 60);
+    return `${h}:${String(m).padStart(2, "0")}`;
+  }
+
   function renderRouteTable(steps) {
-    const container = tableDiv; // ใช้ตัวแปร div แทน getElementById
-    container.innerHTML = ""; // ล้างก่อน
+    const container = tableDiv;
+    container.innerHTML = "";
 
     const table = document.createElement("table");
+    table.id = "route2Table";
 
-    // Header
+    const thead = document.createElement("thead");
     const headerRow = document.createElement("tr");
     [
       "ลำดับ",
@@ -394,14 +412,18 @@ require([
       "ปลายทาง",
       "ระยะทาง (กม.)",
       "ระยะทางสะสม (กม.)",
+      "ถุงยังชีพ",
+      "เวลาเดินทาง (ชม:นาที)",
+      "เวลาสะสม (ชม:นาที)",
     ].forEach((text) => {
       const th = document.createElement("th");
       th.innerText = text;
       headerRow.appendChild(th);
     });
-    table.appendChild(headerRow);
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
 
-    // Data rows
+    const tbody = document.createElement("tbody");
     steps.forEach((step) => {
       const row = document.createElement("tr");
       [
@@ -410,14 +432,17 @@ require([
         step.ปลายทาง,
         step["ระยะทาง (กม.)"],
         step["ระยะทางสะสม (กม.)"],
+        step.ถุงยังชีพ,
+        step["เวลาเดินทาง (ชม:นาที)"],
+        step["เวลาสะสม (ชม:นาที)"],
       ].forEach((val) => {
         const td = document.createElement("td");
         td.innerText = val;
         row.appendChild(td);
       });
-      table.appendChild(row);
+      tbody.appendChild(row);
     });
-
+    table.appendChild(tbody);
     container.appendChild(table);
   }
   document.getElementById("saveRoute").addEventListener("click", async () => {

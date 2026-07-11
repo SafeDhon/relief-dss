@@ -1,7 +1,7 @@
 /* ===== Expand panel width ===== */
 .esri-expand__content {
-  width: 1000px !important;
-  max-width: 1000px !important;
+  width: 1100px !important;
+  max-width: 1100px !important;
   max-height: 70vh !important;
   overflow-y: auto !important;
 }
@@ -61,15 +61,15 @@
   color: white;
 }
 
-/* ===== Vehicle table (5 columns) ===== */
+/* ===== Vehicle table (7 columns) ===== */
 #vehicleTable th:nth-child(1),
 #vehicleTable td:nth-child(1) {
-  width: 6%;
+  width: 5%;
   text-align: center;
 }
 #vehicleTable th:nth-child(2),
 #vehicleTable td:nth-child(2) {
-  width: 27%;
+  width: 20%;
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
@@ -77,7 +77,7 @@
 }
 #vehicleTable th:nth-child(3),
 #vehicleTable td:nth-child(3) {
-  width: 27%;
+  width: 20%;
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
@@ -85,24 +85,34 @@
 }
 #vehicleTable th:nth-child(4),
 #vehicleTable td:nth-child(4) {
-  width: 20%;
+  width: 12%;
   text-align: center;
 }
 #vehicleTable th:nth-child(5),
 #vehicleTable td:nth-child(5) {
-  width: 20%;
+  width: 12%;
+  text-align: center;
+}
+#vehicleTable th:nth-child(6),
+#vehicleTable td:nth-child(6) {
+  width: 15%;
+  text-align: center;
+}
+#vehicleTable th:nth-child(7),
+#vehicleTable td:nth-child(7) {
+  width: 16%;
   text-align: center;
 }
 
-/* ===== Boat table (6 columns) ===== */
+/* ===== Boat table (8 columns) ===== */
 #boatTable th:nth-child(1),
 #boatTable td:nth-child(1) {
-  width: 6%;
+  width: 5%;
   text-align: center;
 }
 #boatTable th:nth-child(2),
 #boatTable td:nth-child(2) {
-  width: 22%;
+  width: 17%;
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
@@ -110,7 +120,7 @@
 }
 #boatTable th:nth-child(3),
 #boatTable td:nth-child(3) {
-  width: 22%;
+  width: 17%;
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
@@ -118,17 +128,27 @@
 }
 #boatTable th:nth-child(4),
 #boatTable td:nth-child(4) {
-  width: 14%;
+  width: 10%;
   text-align: center;
 }
 #boatTable th:nth-child(5),
 #boatTable td:nth-child(5) {
-  width: 18%;
+  width: 11%;
   text-align: center;
 }
 #boatTable th:nth-child(6),
 #boatTable td:nth-child(6) {
-  width: 18%;
+  width: 11%;
+  text-align: center;
+}
+#boatTable th:nth-child(7),
+#boatTable td:nth-child(7) {
+  width: 14%;
+  text-align: center;
+}
+#boatTable th:nth-child(8),
+#boatTable td:nth-child(8) {
+  width: 15%;
   text-align: center;
 }
 

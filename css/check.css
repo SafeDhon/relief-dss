@@ -8,15 +8,16 @@
 }
 
 .delivery-table {
-  width: 1000px;
-  border-collapse: separate; /* ใช้ separate แทน collapse */
-  border-spacing: 0; /* เอาช่องว่างออก */
+  width: 1300px;
+  border-collapse: separate;
+  border-spacing: 0;
   margin: 0 auto 20px;
   text-align: center;
-  font-size: 15px;
+  font-size: 14px;
+  table-layout: fixed;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 10px; /* ✅ ทำให้ตารางมีมุมโค้ง */
-  overflow: hidden; /* บังคับให้เนื้อหาโค้งตาม */
+  border-radius: 10px;
+  overflow: hidden;
   font-family: "Noto Sans Thai", sans-serif;
 }
 
@@ -55,32 +56,47 @@
 
 .delivery-table th:nth-child(1),
 .delivery-table td:nth-child(1) {
-  width: 7%; /* ลำดับ */
+  width: 5%; /* ลำดับ */
 }
 
 .delivery-table th:nth-child(2),
 .delivery-table td:nth-child(2) {
-  width: 30%; /* ต้นทาง */
+  width: 20%; /* ต้นทาง */
 }
 
 .delivery-table th:nth-child(3),
 .delivery-table td:nth-child(3) {
-  width: 30%; /* ปลายทาง */
+  width: 20%; /* ปลายทาง */
 }
 
 .delivery-table th:nth-child(4),
 .delivery-table td:nth-child(4) {
-  width: 13%; /* ระยะทาง */
+  width: 8%; /* ถุงยังชีพ */
 }
 
 .delivery-table th:nth-child(5),
 .delivery-table td:nth-child(5) {
-  width: 13%; /* ระยะทางสะสม */
+  width: 10%; /* ระยะทาง */
 }
 
 .delivery-table th:nth-child(6),
 .delivery-table td:nth-child(6) {
-  width: 7%; /* จัดส่ง (checkbox) */
+  width: 10%; /* ระยะทางสะสม */
+}
+
+.delivery-table th:nth-child(7),
+.delivery-table td:nth-child(7) {
+  width: 12%; /* เวลาเดินทาง */
+}
+
+.delivery-table th:nth-child(8),
+.delivery-table td:nth-child(8) {
+  width: 10%; /* เวลาสะสม */
+}
+
+.delivery-table th:nth-child(9),
+.delivery-table td:nth-child(9) {
+  width: 5%; /* จัดส่ง (checkbox) */
 }
 
 .delivery-table input[type="checkbox"] {
@@ -103,14 +119,14 @@
 }
 
 .table-button {
-  width: 1000px;
+  width: 1300px;
   display: flex;
   justify-content: flex-end;
   margin-top: 0px; /* ระยะห่างจากตาราง */
   gap: 10px;
 }
 .date-button {
-  width: 1000px;
+  width: 1300px;
   display: flex;
   justify-content: flex-end;
   margin-top: 0px; /* ระยะห่างจากตาราง */
@@ -157,7 +173,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 .date-wrapper {
   text-align: end;
-  width: 1000px;
+  width: 1300px;
   position: relative;
   display: inline-block;
   margin-top: 20px; /* ✅ ขยับลง */

@@ -174,13 +174,23 @@ require([
   // เปลี่ยนจาก Object ธรรมดาเป็น Array เพื่อให้ console.table แสดงผลดีขึ้น
   const allPairwiseResultsArray = [];
 
+  function formatTime(minutes) {
+    const h = Math.floor(minutes / 60);
+    const m = Math.round(minutes % 60);
+    return `${h}:${String(m).padStart(2, "0")}`;
+  }
+
   function getRouteWithCumulativeDistance(
     fastestRouteArray,
     tempPairwiseResults,
     stopData = []
   ) {
+    const vehicleSpeed = { 1: 100, 2: 80, 3: 60, 4: 150 }[Number(v)] ?? 80;
+    const unloadMin = { 1: 10, 2: 15, 3: 5, 4: 10 }[Number(v)] ?? 10;
+
     const resultArray = [];
-    let cumulativeDistance = 0;
+    let cumulativeDist = 0;
+    let cumulativeTimeMin = 0;
 
     for (let i = 0; i < fastestRouteArray.length - 1; i++) {
       const fromId = fastestRouteArray[i];
@@ -188,22 +198,27 @@ require([
       const key = `${fromId}-${toId}`;
       const segment = tempPairwiseResults[key];
 
-      // เช็ค stopData ก่อนใช้ .find
       const fromStop = stopData.find?.((s) => s.id === fromId);
       const toStop = stopData.find?.((s) => s.id === toId);
-
       const fromAddress = fromStop ? fromStop.address : fromId;
       const toAddress = toStop ? toStop.address : toId;
 
       if (segment && segment.distance !== null) {
-        cumulativeDistance += segment.distance;
+        cumulativeDist += segment.distance;
+        const travelMin = (segment.distance / vehicleSpeed) * 60;
+        const isReturn = toId === 1;
+        const segMin = travelMin + (isReturn ? 0 : unloadMin);
+        cumulativeTimeMin += segMin;
+
         resultArray.push({
           ลำดับ: i + 1,
           ต้นทาง: fromAddress,
           ปลายทาง: toAddress,
           "ระยะทาง (กม.)": segment.distance,
-          "ระยะทางสะสม (กม.)": cumulativeDistance.toFixed(2),
+          "ระยะทางสะสม (กม.)": parseFloat(cumulativeDist.toFixed(2)),
           ถุงยังชีพ: toStop ? (toStop.bags ?? 0) : 0,
+          "เวลาเดินทาง (ชม:นาที)": formatTime(segMin),
+          "เวลาสะสม (ชม:นาที)": formatTime(cumulativeTimeMin),
         });
       } else {
         resultArray.push({
@@ -211,12 +226,13 @@ require([
           ต้นทาง: fromAddress,
           ปลายทาง: toAddress,
           "ระยะทาง (กม.)": "Error",
-          "ระยะทางรวมสะสม (กม.)": "Error",
+          "ระยะทางสะสม (กม.)": "Error",
           ถุงยังชีพ: toStop ? (toStop.bags ?? 0) : 0,
+          "เวลาเดินทาง (ชม:นาที)": "-",
+          "เวลาสะสม (ชม:นาที)": "-",
         });
       }
     }
-
     return resultArray;
   }
 
@@ -395,22 +411,11 @@ require([
       if (container) {
         container.innerHTML = ""; // ล้างตารางเก่า
 
-        let html = `
-  <table>
-    <colgroup>
-      <col style="width:8%">
-      <col style="width:32%">
-      <col style="width:32%">
-      <col style="width:14%">
-      <col style="width:14%">
-    </colgroup>
-    <thead><tr>
-`;
+        let html = `<table id="route1Table"><thead><tr>`;
         Object.keys(cumulativeRouteArray[0]).forEach((key) => {
           html += `<th>${key}</th>`;
         });
         html += "</tr></thead><tbody>";
-
         cumulativeRouteArray.forEach((row) => {
           html += "<tr>";
           Object.values(row).forEach((val) => {
@@ -418,7 +423,6 @@ require([
           });
           html += "</tr>";
         });
-
         html += "</tbody></table>";
         container.innerHTML = html;
       }

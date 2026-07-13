@@ -49,52 +49,52 @@ function buildTable(data) {
                   <td>
                     <select name="level" class="level-select">
                       <option value="1">ไม่เกิน 30%</option>
-                      <option value="2">31% - 70%</option>
-                      <option value="3">มากกว่า 70%</option>
+                      <option value="3">30% - 70%</option>
+                      <option value="5">มากกว่า 70%</option>
                     </select>
                   </td>
                   <td>
                     <select name="level" class="level-select">
-                      <option value="1">จัดหาเองได้</option>
-                      <option value="2">จัดหาได้บ้าง</option>
-                      <option value="3">ไม่มีทรัพยากร</option>
+                      <option value="1">พึ่งพาตนเองได้</option>
+                      <option value="3">ต้องการความช่วยเหลือบางส่วน</option>
+                      <option value="5">พึ่งพาตนเองไม่ได้</option>
                     </select>
                   </td>
                   <td>
                     <select name="level" class="level-select">
                       <option value="1">เข้าถึงได้ปกติ</option>
-                      <option value="2">เข้าถึงได้บ้าง</option>
-                      <option value="3">เข้าถึงไม่ได้</option>
+                      <option value="3">เข้าถึงได้ยากบางจุด</option>
+                      <option value="5">ไม่สามารถเข้าถึงได้ทางถนน</option>
                     </select>
                   </td>
                   <td>
                     <select name="level" class="level-select">
                       <option value="1">ไม่จำเป็น</option>
-                
-                      <option value="3">จำเป็น</option>
+
+                      <option value="5">จำเป็น</option>
                     </select>
                   </td>
                  
                   <td>
                     <select name="level" class="level-select">
                       <option value="1">น้อยกว่า 24 ชม.</option>
-                      <option value="2">24 ชม. - 48 ชม.</option>
-                      <option value="3">มากกว่า 48 ชม.</option>
+                      <option value="3">24 - 48 ชม.</option>
+                      <option value="5">มากกว่า 48 ชม.</option>
                     </select>
                   </td>
                   
                   <td>
                     <select name="level" class="level-select">
                       <option value="1">เสียหายเล็กน้อย</option>
-                      <option value="2">เสียหายบางจุด</option>
-                      <option value="3">เสียหายทั้งหมด</option>
+                      <option value="3">ระบบสาธารณูปโภค เสียหายบางจุด</option>
+                      <option value="5">ระบบสาธารณูปโภค เสียหายเกือบทั้งหมด</option>
                     </select>
                   </td>
                   <td>
                     <select name="level" class="level-select">
-                      <option value="1">น้อย</option>
-                      <option value="2">ปานกลาง</option>
-                      <option value="3">มาก</option>
+                      <option value="1">ความเสี่ยงน้อย</option>
+                      <option value="3">ความเสี่ยงปานกลาง</option>
+                      <option value="5">ความเสี่ยงมาก</option>
                     </select>
                   </td>
                 

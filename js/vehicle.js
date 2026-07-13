@@ -58,7 +58,7 @@ function getOrigin() {
 }
 
 function buildVehicleCell(accessLevel) {
-  if (accessLevel === 3) {
+  if (accessLevel === 5) {
     return `<select name="level" class="level-select">
       <option value="3">เรือ</option>
       <option value="4">ฮอลิคอปเตอร์</option>
@@ -76,11 +76,11 @@ function buildTable(data) {
       case 1:
         param1 = "เข้าถึงได้ปกติ";
         break;
-      case 2:
-        param1 = "เข้าถึงได้บ้าง";
-        break;
       case 3:
-        param1 = "เข้าถึงไม่ได้";
+        param1 = "เข้าถึงได้ยากบางจุด";
+        break;
+      case 5:
+        param1 = "ไม่สามารถเข้าถึงได้ทางถนน";
         break;
       default:
         param1 = "-"; // กัน error ถ้าไม่มีค่า
@@ -91,7 +91,7 @@ function buildTable(data) {
       case 1:
         param2 = "ไม่จำเป็น";
         break;
-      case 3:
+      case 5:
         param2 = "จำเป็น";
         break;
       default:
@@ -201,7 +201,7 @@ butt.addEventListener("click", async function () {
     const lastGroupTotal = lastGroup.reduce((sum, p) => sum + p._take, 0);
 
     if (lastGroupTotal < TRUCK_THRESHOLD) {
-      const hasModerateAccess = lastGroup.some((p) => p._accessLevel === 2);
+      const hasModerateAccess = lastGroup.some((p) => p._accessLevel === 3);
       if (!hasModerateAccess) {
         lastGroup.forEach((p) => {
           _data[p._idx].vehicle = 1;

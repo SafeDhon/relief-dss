@@ -64,6 +64,9 @@ function buildVehicleCell(accessLevel) {
       <option value="4">ฮอลิคอปเตอร์</option>
     </select>`;
   }
+  if (accessLevel === 3) {
+    return `<span class="no-vehicle">รถยูนิม็อก</span>`;
+  }
   return `<span class="no-vehicle">-</span>`;
 }
 

@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(node --check js/route3.js)"
+      "Bash(node --check js/route3.js)",
+      "Bash(node --check \"js/list.js\")",
+      "Bash(node --check \"js/vehicle.js\")"
     ]
   }
 }

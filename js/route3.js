@@ -255,6 +255,18 @@ require([
     }
   }
 
+  // เลือกเส้นทางที่สั้นกว่าระหว่างสองทิศทาง (ไป vs กลับ) แล้วใช้เส้นทางเดียวกันนั้นทั้งไปและกลับ
+  // เพราะสถานการณ์น้ำท่วมไม่สนใจเลนซ้าย-ขวา ต้องการแค่เส้นทางที่เร็วที่สุดถึงเป้าหมาย
+  function pickBest(routeA, routeB) {
+    const dA = routeA?.distance ?? Infinity;
+    const dB = routeB?.distance ?? Infinity;
+    return dA <= dB ? routeA : routeB;
+  }
+
+  function bestBetween(map, idA, idB) {
+    return pickBest(map[`${idA}-${idB}`], map[`${idB}-${idA}`]);
+  }
+
   function drawBaseMarker() {
     const base = stopData[0];
     if (!base) return;
@@ -554,7 +566,7 @@ let isPlacingBoatLaunch = false;
           backDist = bestRoute[stop.id]?.distance ?? Infinity;
           oldReturn = 0;
         } else {
-          distToStop = stopToStop[`${lastStop.id}-${stop.id}`]?.distance ?? Infinity;
+          distToStop = bestBetween(stopToStop, lastStop.id, stop.id)?.distance ?? Infinity;
           backDist = bestRoute[stop.id]?.distance ?? Infinity;
           oldReturn = bestRoute[lastStop.id]?.distance ?? Infinity;
         }
@@ -689,7 +701,7 @@ let isPlacingBoatLaunch = false;
         // วาดเส้นทางขาไป
         const geom = !lastStop
           ? bestRoute[stop.id]?.geometry
-          : stopToStop[`${lastStop.id}-${stop.id}`]?.geometry;
+          : bestBetween(stopToStop, lastStop.id, stop.id)?.geometry;
         if (geom) {
           routesLayer.add(
             new Graphic({
@@ -1238,6 +1250,12 @@ let isPlacingBoatLaunch = false;
         }
       }
 
+      // ใช้เส้นทางที่สั้นกว่าเสมอ ไม่ว่าจะเป็นขาไปหรือขากลับระหว่างจุดปล่อยเรือกับชุมชนนั้น
+      const bestLpC = {};
+      for (const c of lpCommunities) {
+        bestLpC[c.id] = pickBest(lpToC[c.id], cToLP[c.id]);
+      }
+
       // วางแผนรอบส่ง
       const remaining = {};
       lpCommunities.forEach(c => remaining[c.id] = c.bags);
@@ -1265,12 +1283,12 @@ let isPlacingBoatLaunch = false;
           if (tripStops.length === 0) continue;
 
           // คำนวณระยะทางรวมของ trip นี้
-          let dist = lpToC[tripStops[0].community.id]?.distance ?? Infinity;
+          let dist = bestLpC[tripStops[0].community.id]?.distance ?? Infinity;
           for (let k = 1; k < tripStops.length; k++) {
             const prev = tripStops[k - 1].community, curr = tripStops[k].community;
-            dist += cToC[`${prev.id}-${curr.id}`]?.distance ?? Infinity;
+            dist += bestBetween(cToC, prev.id, curr.id)?.distance ?? Infinity;
           }
-          dist += cToLP[tripStops[tripStops.length - 1].community.id]?.distance ?? Infinity;
+          dist += bestLpC[tripStops[tripStops.length - 1].community.id]?.distance ?? Infinity;
 
           if (dist < bestTripDist) { bestTripDist = dist; bestTripStops = tripStops; }
         }
@@ -1285,8 +1303,8 @@ let isPlacingBoatLaunch = false;
         for (let k = 0; k < bestTripStops.length; k++) {
           const { community, bags } = bestTripStops[k];
           const routeResult = k === 0
-            ? lpToC[community.id]
-            : cToC[`${bestTripStops[k - 1].community.id}-${community.id}`];
+            ? bestLpC[community.id]
+            : bestBetween(cToC, bestTripStops[k - 1].community.id, community.id);
           const d = routeResult?.distance ?? 0;
           totalBoatDist = parseFloat((totalBoatDist + d).toFixed(2));
           const segBoatMin = (d / 60) * 60 + 5;
@@ -1314,7 +1332,7 @@ let isPlacingBoatLaunch = false;
 
         // ขากลับ LP
         const lastC = bestTripStops[bestTripStops.length - 1].community;
-        const retResult = cToLP[lastC.id];
+        const retResult = bestLpC[lastC.id];
         const retDist = retResult?.distance ?? 0;
         totalBoatDist = parseFloat((totalBoatDist + retDist).toFixed(2));
         const segRetMin = (retDist / 60) * 60;

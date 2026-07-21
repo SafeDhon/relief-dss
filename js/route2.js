@@ -88,7 +88,7 @@ require([
   const lap = Number(i) + 1;
   const vehicleMap = {
     1: "รถบรรทุก",
-    2: "รถยูริม็อก",
+    2: "รถยูนิม็อก",
     3: "เรือ",
     4: "เฮลิคอปเตอร์",
   };
@@ -285,8 +285,8 @@ require([
   // ---------- สร้าง array ลำดับเส้นทาง (ใช้ address + km) ----------
   const routeIds = minRoute.route.split(" → ").map(Number);
 
-  const vehicleSpeed = { 1: 100, 2: 80, 3: 60, 4: 150 }[Number(v)] ?? 80;
-  const unloadMin = { 1: 10, 2: 15, 3: 5, 4: 10 }[Number(v)] ?? 10;
+  const vehicleSpeed = { 1: 80, 2: 80, 3: 20, 4: 100 }[Number(v)] ?? 80;
+  const unloadMin = { 1: 10, 2: 10, 3: 5, 4: 15 }[Number(v)] ?? 10;
 
   const routeSteps = [];
   let cumulative = 0;

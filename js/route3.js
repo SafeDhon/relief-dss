@@ -77,7 +77,7 @@ require([
 
   const vehicleMap = {
     1: "รถบรรทุก",
-    2: "รถยูริม็อก",
+    2: "รถยูนิม็อก",
     3: "เรือ",
     4: "เฮลิคอปเตอร์",
   };
@@ -1189,7 +1189,8 @@ let isPlacingBoatLaunch = false;
 
     if (bestVehOrder) {
       const vehicleSpeed = 80;
-      const vehUnloadMin = 15;
+      // เวลาถ่ายของขึ้นเรือที่จุดปล่อยเรือ (ไม่ใช่เวลาถ่ายของปกติของรถ) จึงใช้ 5 นาทีเท่ากับรอบขนของของเรือ
+      const vehUnloadMin = 5;
       let cumDist = 0;
       let cumVehTimeMin = 0;
       for (let i = 0; i < bestVehOrder.length - 1; i++) {
@@ -1307,7 +1308,7 @@ let isPlacingBoatLaunch = false;
             : bestBetween(cToC, bestTripStops[k - 1].community.id, community.id);
           const d = routeResult?.distance ?? 0;
           totalBoatDist = parseFloat((totalBoatDist + d).toFixed(2));
-          const segBoatMin = (d / 60) * 60 + 5;
+          const segBoatMin = (d / 20) * 60 + 5;
           totalBoatTimeMin += segBoatMin;
           if (routeResult?.geometry) {
             routesLayer.add(new Graphic({
@@ -1335,7 +1336,10 @@ let isPlacingBoatLaunch = false;
         const retResult = bestLpC[lastC.id];
         const retDist = retResult?.distance ?? 0;
         totalBoatDist = parseFloat((totalBoatDist + retDist).toFixed(2));
-        const segRetMin = (retDist / 60) * 60;
+        // ถ้ายังมีชุมชนเหลือรอส่งที่ LP นี้ = ต้องขนถุงยังชีพชุดใหม่ลงเรืออีกรอบ +5 นาที
+        // ถ้าของหมดแล้ว (จบรอบสุดท้าย) = ไม่มีของให้ขนต่อ ไม่บวก
+        const hasNextTrip = lpCommunities.some(c => remaining[c.id] > 0);
+        const segRetMin = (retDist / 20) * 60 + (hasNextTrip ? 5 : 0);
         totalBoatTimeMin += segRetMin;
         if (retResult?.geometry) {
           routesLayer.add(new Graphic({

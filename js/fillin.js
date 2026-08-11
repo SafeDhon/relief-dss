@@ -138,7 +138,7 @@ butt.addEventListener("click", function () {
 
   inputs.forEach((el) => {
     if (el.disabled) return; // ข้าม input ที่ disabled
-    if (el.type === "checkbox" || el.type === "radio") return; // ข้าม checkbox/radio
+    if (el.type === "checkbox" || el.type === "radio" || el.type === "file") return;
     if (el.value.trim() === "") {
       hasEmpty = true;
       el.classList.add("input-error"); // เพิ่มคลาสเพื่อเน้นช่องที่ว่าง (ถ้ามี CSS)
@@ -242,6 +242,86 @@ function updateIdsWithIndex(data) {
 const backBtn = document.getElementById("backBtn");
 backBtn.addEventListener("click", () => {
   window.location.href = "home.html";
+});
+
+// ── Excel: ดาวน์โหลด Template ────────────────────────────────────────────
+function downloadTemplate() {
+  const communities = getArray();
+  if (!communities || communities.length === 0) {
+    alert("ไม่พบข้อมูลชุมชน กรุณากลับไปเลือกชุมชนก่อน");
+    return;
+  }
+
+  const headers = [
+    "id", "ชุมชน",
+    "จำนวนผู้ประสบภัย", "จำนวนกลุ่มเปราะบาง",
+    "ระดับความเสียหาย (1/3/5)",
+    "ความสามารถพึ่งพาตนเอง (1/3/5)",
+    "ความลำบากเข้าถึงพื้นที่ (1/3/5)",
+    "ใช้พาหนะของ ทอ. เท่านั้น (1/5)",
+    "ระยะเวลาประสบภัย (1/3/5)",
+    "ระดับความรุนแรง (1/3/5)",
+    "ความเสี่ยงที่อาจเกิดซ้ำ (1/3/5)",
+  ];
+
+  const rows = [headers];
+  communities.forEach((c) => {
+    rows.push([c.id, c.address, "", "", "", "", "", "", "", "", ""]);
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "ข้อมูลชุมชน");
+  XLSX.writeFile(wb, "fillin_template.xlsx");
+}
+
+// ── Excel: โหลดจาก Excel ─────────────────────────────────────────────────
+function loadFromExcel(file) {
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      const workbook = XLSX.read(new Uint8Array(e.target.result), { type: "array" });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+      const dataRows = rows.slice(1).filter((r) => r.length > 0);
+      const tableRows = document.querySelectorAll("#myTable tr");
+
+      if (dataRows.length !== tableRows.length) {
+        alert(`จำนวนแถวใน Excel (${dataRows.length}) ไม่ตรงกับชุมชนในระบบ (${tableRows.length})`);
+        return;
+      }
+
+      dataRows.forEach((excelRow, idx) => {
+        const tr = tableRows[idx];
+        const inputs = tr.querySelectorAll('input[type="number"]');
+        const selects = tr.querySelectorAll("select");
+
+        if (inputs[0]) inputs[0].value = excelRow[2] ?? "";
+        if (inputs[1]) inputs[1].value = excelRow[3] ?? "";
+
+        // col 4–10 → select 0–6
+        [4, 5, 6, 7, 8, 9, 10].forEach((col, selIdx) => {
+          if (selects[selIdx] && excelRow[col] != null) {
+            selects[selIdx].value = String(excelRow[col]);
+          }
+        });
+      });
+    } catch (err) {
+      alert("เกิดข้อผิดพลาดในการอ่านไฟล์ Excel");
+      console.error(err);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+document.getElementById("btnDownloadTemplate").addEventListener("click", downloadTemplate);
+document.getElementById("excelFileInput").addEventListener("change", function (e) {
+  const file = e.target.files[0];
+  if (file) {
+    loadFromExcel(file);
+    e.target.value = "";
+  }
 });
 
 // var testData = [

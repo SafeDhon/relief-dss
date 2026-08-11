@@ -184,3 +184,37 @@ body {
   text-align: center; /* จัดข้อความตรงกลางแนวนอน */
   /* vertical-align: middle; จัดข้อความตรงกลางแนวตั้ง (ถ้าสูงกว่าปกติ) */
 }
+
+.excel-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.btn-excel {
+  padding: 0 16px;
+  height: 36px;
+  font-size: 14px;
+  font-family: "Noto Sans Thai", sans-serif;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  transition: filter 0.2s ease;
+}
+
+.btn-excel:hover {
+  filter: brightness(0.88);
+}
+
+.btn-excel-dl {
+  background-color: #1a5fc8;
+  color: white;
+}
+
+.btn-excel-ul {
+  background-color: #2d9e7a;
+  color: white;
+}

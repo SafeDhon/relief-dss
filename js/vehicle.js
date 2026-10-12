@@ -67,7 +67,7 @@ function buildVehicleCell(accessLevel) {
   if (accessLevel === 3) {
     return `<span class="no-vehicle">รถยูนิม็อก</span>`;
   }
-  return `<span class="no-vehicle">-</span>`;
+  return `<span class="no-vehicle">ยูนิม็อก/รถบรรทุก</span>`;
 }
 
 function buildTable(data) {

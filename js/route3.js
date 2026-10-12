@@ -32,7 +32,7 @@ require([
   // const apiKey =
   // "AAPTxy8BH1VEsoebNVZXo8HurBEwtQ3TZNnChgqbR-VNfayPQ2LL2HzAyWwmz4JkMpHlO8ny01mMiOXu9L4R_5BchZcNTEqcvmJnhFE5OjLaMs0DK0he1Eeil0PyCiqaII0Da7tFc7KKxexFyOzk-ShAp9NzcEJfnylkw0NGQHDAm3prSxAVrG6R_5BchZcNTEqcvmJnhFE5OjLaMs0DK0he1Eeil0PyCiqaII0Da7tFc7KKxexFyOzk-ShAp9NzcEJfnylkw0NGQHDAm3prSxAVrG6RAtu3utx_F8tuzuy74-1yu7UtCF7K6l5AlYIZi3N7XRAA55U9DUzQaLhNsfcE8PGnRW3l64PM0qYgAT1_b6Losegl"; // *** อย่าลืมเปลี่ยนเป็น ArcGIS API Key ของคุณ! ***
   const apiKey =
-    "AAPTxy8BH1VEsoebNVZXo8HurKkVHTRC57kXcOyUhu0FRgeHsBnlZmxAL2TXr9hSHt-0qfy83LKeW0vhUYtEKp_Nm3rpKrWvIP4wOZJY_LE6xnmcRPkJK1j3EeHTrp_VDCUexyJK0PEKIDWsn6WAHmuhkWDrtpGqsd5IdKZ48xmh8AKSxiGXgEG2IAywaCGMJNt1HWGxLeP_rlEutsm9HnaIh7WIGoJuMy-FZI0H39ehvDQ.AT1_AeCqLU8e";
+    "AAPTau26YqPUYLacaV1khL_SlFQ..BSF8xyueOyRtpt1Ah2AJWE6l0Cc6g7Oec9-tGTAV37OeWiJgOxz_u1t0Ncsn1Qe09eO-Ufogsd5iMYoL3wjRJp9jlNPDshNx9tH0g_zkwbwMgQrSSlH6_RlJyWaDV1u5Lw2wwVylnlt738AYwfskI6LXykbcituXmPFw8kYyQxhBMbC2XmT96is9RdUl1_rsd6vPmYyOalMPmx85ww0Ey0l0WLQh-_m5jbEnRc-NLuBId-HiIeX966v1vrHYSQ..AT1_Hm7xVIcD";
   esriConfig.apiKey = apiKey;
   const routeUrl =
     "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";

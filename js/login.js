@@ -25,6 +25,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const passwordInput = document.getElementById("password");
   const loginBtn = document.getElementById("loginBtn");
   const errorMsg = document.getElementById("errorMsg");
+  const togglePassword = document.getElementById("togglePassword");
+
+  // ✅ กดไอคอนตาเพื่อแสดง/ซ่อนรหัสผ่าน
+  togglePassword.addEventListener("click", () => {
+    const isHidden = passwordInput.type === "password";
+    passwordInput.type = isHidden ? "text" : "password";
+    // <svg> ไม่มี property .hidden จึงต้องสลับผ่าน attribute
+    togglePassword.querySelector(".icon-eye").toggleAttribute("hidden", isHidden);
+    togglePassword.querySelector(".icon-eye-off").toggleAttribute("hidden", !isHidden);
+    const label = isHidden ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน";
+    togglePassword.setAttribute("aria-label", label);
+    togglePassword.title = label;
+  });
 
   loginBtn.addEventListener("click", async () => {
     const email = emailInput.value.trim();

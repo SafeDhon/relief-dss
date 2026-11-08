@@ -49,7 +49,7 @@ function buildTable(data) {
                   <td>
                     <select name="level" class="level-select">
                       <option value="1">ไม่เกิน 30%</option>
-                      <option value="3">30% - 70%</option>
+                      <option value="3">31% - 70%</option>
                       <option value="5">มากกว่า 70%</option>
                     </select>
                   </td>

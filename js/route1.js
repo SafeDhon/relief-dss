@@ -175,8 +175,10 @@ require([
   const allPairwiseResultsArray = [];
 
   function formatTime(minutes) {
-    const h = Math.floor(minutes / 60);
-    const m = Math.round(minutes % 60);
+    // ปัดเป็นนาทีเต็มก่อนแยกชั่วโมง กันกรณีแสดงเป็น "0:60"
+    const total = Math.round(minutes);
+    const h = Math.floor(total / 60);
+    const m = total % 60;
     return `${h}:${String(m).padStart(2, "0")}`;
   }
 
@@ -207,7 +209,7 @@ require([
         cumulativeDist += segment.distance;
         const travelMin = (segment.distance / vehicleSpeed) * 60;
         const isReturn = toId === 1;
-        const segMin = travelMin + (isReturn ? 0 : unloadMin);
+        const segMin = Math.round(travelMin + (isReturn ? 0 : unloadMin));
         cumulativeTimeMin += segMin;
 
         resultArray.push({

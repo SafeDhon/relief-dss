@@ -792,8 +792,10 @@ let isPlacingBoatLaunch = false;
   }
 
   function formatTime(minutes) {
-    const h = Math.floor(minutes / 60);
-    const m = Math.round(minutes % 60);
+    // ปัดเป็นนาทีเต็มก่อนแยกชั่วโมง กันกรณีแสดงเป็น "0:60"
+    const total = Math.round(minutes);
+    const h = Math.floor(total / 60);
+    const m = total % 60;
     return `${h}:${String(m).padStart(2, "0")}`;
   }
 
@@ -1206,7 +1208,7 @@ let isPlacingBoatLaunch = false;
           }));
         }
         const isBaseReturn = bestVehOrder[i + 1] === 0;
-        const segVehMin = (d / vehicleSpeed) * 60 + (isBaseReturn ? 0 : vehUnloadMin);
+        const segVehMin = Math.round((d / vehicleSpeed) * 60 + (isBaseReturn ? 0 : vehUnloadMin));
         cumVehTimeMin += segVehMin;
         vehicleRouteArray.push({
           ต้นทาง: from.label,
@@ -1308,7 +1310,7 @@ let isPlacingBoatLaunch = false;
             : bestBetween(cToC, bestTripStops[k - 1].community.id, community.id);
           const d = routeResult?.distance ?? 0;
           totalBoatDist = parseFloat((totalBoatDist + d).toFixed(2));
-          const segBoatMin = (d / 20) * 60 + 5;
+          const segBoatMin = Math.round((d / 20) * 60 + 5);
           totalBoatTimeMin += segBoatMin;
           if (routeResult?.geometry) {
             routesLayer.add(new Graphic({
@@ -1339,7 +1341,7 @@ let isPlacingBoatLaunch = false;
         // ถ้ายังมีชุมชนเหลือรอส่งที่ LP นี้ = ต้องขนถุงยังชีพชุดใหม่ลงเรืออีกรอบ +5 นาที
         // ถ้าของหมดแล้ว (จบรอบสุดท้าย) = ไม่มีของให้ขนต่อ ไม่บวก
         const hasNextTrip = lpCommunities.some(c => remaining[c.id] > 0);
-        const segRetMin = (retDist / 20) * 60 + (hasNextTrip ? 5 : 0);
+        const segRetMin = Math.round((retDist / 20) * 60 + (hasNextTrip ? 5 : 0));
         totalBoatTimeMin += segRetMin;
         if (retResult?.geometry) {
           routesLayer.add(new Graphic({

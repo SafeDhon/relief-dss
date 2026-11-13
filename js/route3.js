@@ -807,7 +807,7 @@ let isPlacingBoatLaunch = false;
     if (vehicleRouteArray.length > 0) {
       html += "<p class='route-section-title'>แผนการเดินทางรถ</p>";
       html += "<table id='vehicleTable'><thead><tr>" +
-        "<th>ลำดับ</th><th>ต้นทาง</th><th>ปลายทาง</th><th>ระยะทาง รถ (กม.)</th><th>ระยะทางสะสม รถ (กม.)</th><th>เวลาเดินทาง (ชม:นาที)</th><th>เวลาสะสม (ชม:นาที)</th>" +
+        "<th>ลำดับ</th><th>ต้นทาง</th><th>ปลายทาง</th><th>ระยะทาง รถ (กม.)</th><th>ระยะทางสะสม รถ (กม.)</th><th>เวลา (ชม:นาที)</th><th>เวลาสะสม (ชม:นาที)</th>" +
         "</tr></thead><tbody>";
       vehicleRouteArray.forEach((row, idx) => {
         html += `<tr><td>${idx + 1}</td><td>${row.ต้นทาง}</td><td>${row.ปลายทาง}</td><td>${row["ระยะทาง (กม.)"]}</td><td>${row["ระยะทางสะสม (กม.)"]}</td><td>${row["เวลาเดินทาง (ชม:นาที)"] ?? "-"}</td><td>${row["เวลาสะสม (ชม:นาที)"] ?? "-"}</td></tr>`;
@@ -819,7 +819,7 @@ let isPlacingBoatLaunch = false;
       html += "<p class='route-section-title'>แผนการเดินทางเรือ</p>";
       html += "<table id='boatTable'><thead><tr>" +
         "<th>ลำดับ</th><th>ต้นทาง</th><th>ปลายทาง</th>" +
-        "<th>ถุงยังชีพที่ขน</th><th>ระยะทาง เรือ (กม.)</th><th>ระยะทางสะสม เรือ (กม.)</th><th>เวลาเดินทาง (ชม:นาที)</th><th>เวลาสะสม (ชม:นาที)</th>" +
+        "<th>ถุงยังชีพที่ขน</th><th>ระยะทาง เรือ (กม.)</th><th>ระยะทางสะสม เรือ (กม.)</th><th>เวลา (ชม:นาที)</th><th>เวลาสะสม (ชม:นาที)</th>" +
         "</tr></thead><tbody>";
       cumulativeRouteArray.forEach((row) => {
         html += `<tr><td>${row.ลำดับ}</td><td>${row.ต้นทาง}</td><td>${row.ปลายทาง}</td><td>${row["ถุงยังชีพที่ขน"] || "-"}</td><td>${row["ระยะทาง (กม.)"]}</td><td>${row["ระยะทางสะสม (กม.)"]}</td><td>${row["เวลาเดินทาง (ชม:นาที)"] ?? "-"}</td><td>${row["เวลาสะสม (ชม:นาที)"] ?? "-"}</td></tr>`;

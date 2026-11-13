@@ -111,7 +111,7 @@ function renderTables(data, refID) {
       function buildTableHTML(rows, docId, key, useCheckbox = true, skipLastRow = true) {
         return `
           <table class="delivery-table">
-            <thead><tr>${orderedHeaders.map((h) => `<th>${h}</th>`).join("")}</tr></thead>
+            <thead><tr>${orderedHeaders.map((h) => `<th>${h === "เวลาเดินทาง (ชม:นาที)" ? "เวลา (ชม:นาที)" : h}</th>`).join("")}</tr></thead>
             <tbody>
               ${rows.map(({ row: o, origIdx }, i) => `
                 <tr>

@@ -415,7 +415,8 @@ require([
 
         let html = `<table id="route1Table"><thead><tr>`;
         Object.keys(cumulativeRouteArray[0]).forEach((key) => {
-          html += `<th>${key}</th>`;
+          // เปลี่ยนแค่ข้อความหัวตาราง ชื่อ key ยังคงเดิมเพราะใช้บันทึกลง Firebase
+          html += `<th>${key === "เวลาเดินทาง (ชม:นาที)" ? "เวลา (ชม:นาที)" : key}</th>`;
         });
         html += "</tr></thead><tbody>";
         cumulativeRouteArray.forEach((row) => {

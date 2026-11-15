@@ -28,7 +28,7 @@ _vehicles = [
   {
     id: 3,
     name: "เรือ",
-    capacity: 350,
+    capacity: 300,
   },
   {
     id: 4,

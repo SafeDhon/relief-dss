@@ -36,6 +36,27 @@ onAuthStateChanged(auth, (user) => {
 
 const searchOptions = document.getElementById("searchOptions");
 const listContainer = document.getElementById("listContainer");
+const selectAll = document.getElementById("selectAll");
+const selectAllWrapper = document.getElementById("selectAllWrapper");
+
+function getCommunityCheckboxes() {
+  return Array.from(listContainer.querySelectorAll("input[type=checkbox]"));
+}
+
+// ✅ อัปเดตสถานะ "เลือกทั้งหมด" ให้ตรงกับ checkbox ของชุมชน (ติ๊กบางส่วน = ขีดกลาง)
+function syncSelectAll() {
+  const boxes = getCommunityCheckboxes();
+  const checkedCount = boxes.filter((b) => b.checked).length;
+  selectAll.checked = boxes.length > 0 && checkedCount === boxes.length;
+  selectAll.indeterminate = checkedCount > 0 && checkedCount < boxes.length;
+}
+
+selectAll.addEventListener("change", () => {
+  getCommunityCheckboxes().forEach((checkbox) => {
+    checkbox.checked = selectAll.checked;
+    checkbox.closest("li").classList.toggle("selected", selectAll.checked);
+  });
+});
 
 searchOptions.addEventListener("change", async () => {
   const selectedWing = Number(searchOptions.value); // แปลงเป็น number
@@ -45,6 +66,9 @@ searchOptions.addEventListener("change", async () => {
 
   // 🔹 ล้าง list ก่อน
   listContainer.innerHTML = "";
+  selectAllWrapper.hidden = true;
+  selectAll.checked = false;
+  selectAll.indeterminate = false;
 
   try {
     // สร้าง query
@@ -95,10 +119,14 @@ searchOptions.addEventListener("change", async () => {
         } else {
           li.classList.remove("selected");
         }
+        syncSelectAll();
       });
 
       counter++;
     });
+
+    // แสดงปุ่ม "เลือกทั้งหมด" เมื่อมีรายชื่อชุมชนแล้ว
+    selectAllWrapper.hidden = false;
   } catch (e) {
     console.error("Error getting documents: ", e);
     const li = document.createElement("li");

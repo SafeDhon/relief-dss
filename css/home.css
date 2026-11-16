@@ -158,6 +158,25 @@
   margin-top: 0px; /* ระยะห่างจากขอบบน ปรับได้ตามต้องการ */
 }
 
+.select-all {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.select-all[hidden] {
+  display: none;
+}
+
+.select-all input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #04aa6d;
+  cursor: pointer;
+}
+
 #listContainer li.selected {
   background-color: #e0f0ff;
   /* font-weight: bold; */
